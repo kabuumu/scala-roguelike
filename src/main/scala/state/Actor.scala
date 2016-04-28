@@ -47,6 +47,4 @@ case class Actor(pos: Position, attributes: Map[AttributeName, Attribute], isPC:
       .+((name,f(get(name)))
       )
   )
-
-  Attribute.current(Attribute(0,0))(x => x.)
-}5
+}

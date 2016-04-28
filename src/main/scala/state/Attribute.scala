@@ -13,5 +13,4 @@ case class Attribute(current: Int, max: Int){
 
 object Attribute{
   def apply(max: Int) = new Attribute(max, max)
-  def current(attribute: Attribute) = (f: Int => Int) => attribute.copy(current = f(attribute.current))
 }

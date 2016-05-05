@@ -20,26 +20,7 @@ object Main extends JFXApp {
 
   var lastDelta = 0
   var keyCode:KeyCode = null
-  var state:GameState = GameState(
-    Set(
-      Actor(
-        Position(5, 5),
-        Map(
-          (INITIATIVE, Attribute(10)),
-          (HEALTH, Attribute(10))
-        ),
-        isPC = true
-      ),
-      Actor(
-        Position(3, 3),
-        Map(
-          (INITIATIVE, Attribute(5)),
-          (HEALTH, Attribute(10))
-        ),
-        isPC = false)
-    ),
-    10
-  )
+  var state:GameState = GameState.startingState
   val frameRate = 1 //200ms
 
   stage = new PrimaryStage {

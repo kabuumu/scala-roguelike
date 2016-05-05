@@ -1,6 +1,6 @@
 package main
 
-import state.GameState
+import state.{GameState, Position}
 
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color
@@ -13,7 +13,13 @@ object Output {
     val g2d = canvas.getGraphicsContext2D
     val size = 32
 
-    g2d.clearRect(0, 0, 512, 512)
+    val height = 512
+    val width = 512
+
+    val pos = state.getHero.map(_.pos).getOrElse(Position(0,0))
+    val offset = (n: Int) => n-(height/size/2)+1
+
+    g2d.clearRect(0, 0, height, width)
 
     g2d.setFill(Color.Green)
     state.actors.foreach(a => {
@@ -27,7 +33,7 @@ object Output {
             g2d.setFill(Color.Black)
         }
       }
-      g2d.fillRect(a.pos.x * size, a.pos.y * size, size, size)
+      g2d.fillRect((a.pos.x - offset(pos.x)) * size, (a.pos.y - offset(pos.y)) * size, size, size)
     })
   }
 }

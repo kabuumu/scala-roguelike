@@ -19,6 +19,7 @@ case class Actor(pos: Position, attributes: Map[AttributeName, Attribute], isPC:
   def getCollision(pos: Position, state: GameState) = {
     state.getActor(pos)
       .filterNot(_ == this)
+      .filter(_.isAlive)
   }
 
   //Combat functions
@@ -30,7 +31,7 @@ case class Actor(pos: Position, attributes: Map[AttributeName, Attribute], isPC:
 
   def getHit(damage: Int): Actor = mod(HEALTH)(_.current(_-damage))
 
-  def interact(target: Actor): Actor = target match {
+  def interact = (target: Actor) => target match {
     case a if a.isAlive => attack(target)
     case _ => target
   }

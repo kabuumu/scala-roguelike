@@ -10,12 +10,12 @@ case class GameState(actors: Seq[Actor], pcTimer: Int) {
 
   def update(input: Input) = actors.indices.foldLeft(this)((state, actorID) => (state.actors(actorID), pcTimer, input) match{
     case (pc, _, _) if pc.isPC =>
-      pc.update(input, state)
+      Actor.update(input, state)(pc)
         .getOrElse(state)
         .copy(pcTimer = pc.get(INITIATIVE).current)
     case (_, 0, NONE) => state //If it is the player's turn, but there is no input, do nothing.
     case (npc, _, _) if npc.isAlive =>
-      npc.update(AI.getCommand(npc, state), state)
+      Actor.update(AI.getCommand(npc, state), state)(npc)
         .getOrElse(state)
     case _ => state
   })
@@ -41,7 +41,7 @@ object GameState{
       Actor(
         Position(3, 3),
         Map(
-          (INITIATIVE, Attribute(7)),
+          (INITIATIVE, Attribute(12)),
           (HEALTH, Attribute(10))
         ),
         isPC = false)

@@ -1,6 +1,7 @@
 package main
 
-import state.{GameState, Position}
+import movement.Position
+import state.{Actor, GameState}
 
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color
@@ -24,9 +25,9 @@ object Output {
     g2d.setFill(Color.Green)
     state.actors.foreach(a => {
       a match {
-        case pc if pc.isPC =>
+        case pc:Actor if pc.isPC =>
           g2d.setFill(Color.Green)
-        case enemy => enemy match {
+        case enemy:Actor => enemy match {
           case alive if alive.isAlive =>
             g2d.setFill(Color.Red)
           case dead =>

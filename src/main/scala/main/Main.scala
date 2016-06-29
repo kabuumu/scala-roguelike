@@ -36,7 +36,7 @@ object Main extends JFXApp {
 
   AnimationTimer { now: Long =>
     //if (now - lastDelta >= frameRate) {
-      state = state.update(Input(keyCode))
+      state = GameState.update(Input(keyCode))(state)
       Output.update(state, canvas)
       if(state.pcTimer == 0) keyCode = null
     //}

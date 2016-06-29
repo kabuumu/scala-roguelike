@@ -2,32 +2,32 @@ package state
 
 import ai.AI
 import input.{Input, NONE}
+import movement.Position
 
 /**
   * Created by rob on 22/04/16.
   */
-case class GameState(actors: Seq[Actor], pcTimer: Int) {
+case class GameState(actors: Seq[Actor], projectiles: Seq[Projectile], pcTimer: Int) {
+  def mod(actor: Actor)(f: Actor => Actor) = copy(actors = actors.map(a => if(a == actor) f(actor) else a))
 
-  def update(input: Input) = actors.indices.foldLeft(this)((state, actorID) => (state.actors(actorID), pcTimer, input) match{
-    case (pc, _, _) if pc.isPC =>
+  def getActor(pos: Position) = actors.find(actor => actor.pos.x == pos.x && actor.pos.y == pos.y)
+
+  def getHero = actors.find{case a:Actor => a.isPC}
+}
+
+object GameState{
+  def update(input: Input)(state: GameState) = state.actors.indices.foldLeft(state)((state, actorID) => (state.actors(actorID), state.pcTimer, input) match{
+    case (pc:Actor, _, _) if pc.isPC =>
       Actor.update(input, state)(pc)
         .getOrElse(state)
         .copy(pcTimer = pc.get(INITIATIVE).current)
     case (_, 0, NONE) => state //If it is the player's turn, but there is no input, do nothing.
-    case (npc, _, _) if npc.isAlive =>
+    case (npc:Actor, _, _) if npc.isAlive =>
       Actor.update(AI.getCommand(npc, state), state)(npc)
         .getOrElse(state)
     case _ => state
   })
 
-  def mod(actor: Actor)(f: Actor => Actor) = copy(actors = actors.map(a => if(a == actor) f(actor) else a))
-
-  def getActor(pos: Position) = actors.find(actor => actor.pos.x == pos.x && actor.pos.y == pos.y)
-
-  def getHero = actors.find(_.isPC)
-}
-
-object GameState{
   val startingState = GameState(
     Seq(
       Actor(
@@ -46,6 +46,7 @@ object GameState{
         ),
         isPC = false)
     ),
+    Nil,
     10
     )
 }

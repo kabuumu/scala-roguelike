@@ -1,13 +1,16 @@
 package movement
 
+import events.Entity
 import movement.Direction.Direction
 
 /**
   * Created by rob on 26/04/16.
   */
-case class Position(x: Int, y: Int) {
+case class Position(x: Int, y: Int, blocked: Boolean = false) extends Entity {
   def x(f: Int => Int): Position = copy(x = f(x))
   def y(f: Int => Int): Position = copy(y = f(y))
+  lazy val block = copy(blocked = true)
+  lazy val unblock = copy(blocked = false)
 }
 
 object Position {

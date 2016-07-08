@@ -35,8 +35,7 @@ case class Actor(pos: Position, attributes: Map[AttributeName, Attribute], isPC:
 
   def mod(name: AttributeName)(f: Attribute => Attribute) = copy(
     attributes = attributes
-      .+((name, f(get(name)))
-      )
+      .+((name, f(get(name))))
   )
 
   override def pos(f: (Position) => Position) = copy(pos = f(pos))
@@ -50,15 +49,7 @@ object Actor {
   def update(input: Input, state: GameState)(actor: Actor): Option[GameState] = {
     if (actor.get(INITIATIVE).current > 0) Some(state.mod(actor)(_.mod(INITIATIVE)(_.current(_ - 1))))
     else {
-      Some(input).collect{case i:Direction => movePos(i)(actor.pos)}
-        .map(state.mod(_)(actor.interact))
-        .getOrElse(state
-          .mod(actor)(
-            move(Direction.Up)
-          ).mod(actor)(
-          _.mod(INITIATIVE)(_.reset)
-        ))
-      )
+      Some(state)
     }
   }
 }

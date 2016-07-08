@@ -1,12 +1,13 @@
 package movement
 
+import events.Entity
 import movement.Direction.Direction
 import movement.Position._
 
 /**
   * Created by rob on 21/06/16.
   */
-trait Mover [T <: Mover[_]]{
+trait Mover [T <: Mover[_]] extends Entity{
   val pos: Position
 
   def pos(f: Position => Position): T

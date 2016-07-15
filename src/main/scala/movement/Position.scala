@@ -6,11 +6,15 @@ import movement.Direction.Direction
 /**
   * Created by rob on 26/04/16.
   */
-case class Position(x: Int, y: Int, blocked: Boolean = false) extends Entity {
+case class Position(x: Int, y: Int, blocked: Option[Int] = None) extends Entity {
+  val id = -1
   def x(f: Int => Int): Position = copy(x = f(x))
   def y(f: Int => Int): Position = copy(y = f(y))
-  lazy val block = copy(blocked = true)
-  lazy val unblock = copy(blocked = false)
+  def block(e: Int) = copy(blocked = Some(e))
+  def unblock(e: Int) = {
+    copy(blocked = blocked.filterNot(_ == e))
+  }
+  def ~= (pos: Position) = pos.x == x && pos.y == y
 }
 
 object Position {

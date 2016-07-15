@@ -5,7 +5,7 @@ import input._
 import movement.Direction.Direction
 import movement.{Direction, Mover, Position}
 
-case class Actor(pos: Position, attributes: Map[AttributeName, Attribute], isPC: Boolean) extends Mover[Actor] {
+case class Actor(id: Int, pos: Position, attributes: Map[AttributeName, Attribute], isPC: Boolean) extends Mover[Actor] {
   def getCollision(pos: Position, state: GameState) = {
     state.getActor(pos)
       .filterNot(_ == this)

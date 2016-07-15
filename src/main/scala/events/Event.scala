@@ -5,12 +5,13 @@ import events.Event.EventReturn
 /**
   * Created by rob on 29/06/16.
   */
-class Event(val id: Int, f: PartialFunction[(GameState, Entity), EventReturn]) extends ((GameState, Entity) => (Entity, Seq[Event])){
-  def apply(s: GameState, e: Entity): (Entity, Seq[Event]) = f.lift(s, e).getOrElse(e, Nil)
+class Event(val id: Int, f: PartialFunction[Entity, EventReturn]) extends (Entity => (Entity, Seq[Event])){
+  def apply(e: Entity): (Entity, Seq[Event]) = f.apply(e)
+  def isDefinedAt(e: Entity): Boolean = f.isDefinedAt(e)
 }
 
 object Event{
   type EventReturn = (Entity, Seq[Event])
 
-  def apply(id: Int, f: PartialFunction[(GameState, Entity), (Entity, Seq[Event])]) = new Event(id, f)
+  def apply(id: Int, f: PartialFunction[Entity, (Entity, Seq[Event])]) = new Event(id, f)
 }

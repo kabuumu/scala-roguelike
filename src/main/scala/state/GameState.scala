@@ -30,7 +30,7 @@ object GameState{
 
   val startingState = GameState(
     Seq(
-      Actor(
+      Actor(0,
         Position(5, 5),
         Map(
           (INITIATIVE, Attribute(10)),
@@ -38,7 +38,7 @@ object GameState{
         ),
         isPC = true
       ),
-      Actor(
+      Actor(0,
         Position(3, 3),
         Map(
           (INITIATIVE, Attribute(12)),

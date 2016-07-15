@@ -1,7 +1,9 @@
 package main
 
+import events.GameState
 import input.Input
-import state._
+import movement.{Mover, Position}
+import state.Actor
 
 import scala.language.postfixOps
 import scalafx.Includes._
@@ -20,7 +22,7 @@ object Main extends JFXApp {
 
   var lastDelta = 0
   var keyCode:KeyCode = null
-  var state:GameState = GameState.startingState
+  var state:GameState = GameState(Seq(Actor(0, Position(0,0), Map(), isPC = true), Position(0,0), Position(0,1), Position(1,0), Position(1,1)))
   val frameRate = 1 //200ms
 
   stage = new PrimaryStage {
@@ -35,11 +37,8 @@ object Main extends JFXApp {
   }
 
   AnimationTimer { now: Long =>
-    //if (now - lastDelta >= frameRate) {
-      state = GameState.update(Input(keyCode))(state)
-      Output.update(state, canvas)
-      if(state.pcTimer == 0) keyCode = null
-    //}
+    state = state.processEvents(Input(keyCode))
+    Output.update(state, canvas)
   }.start()
 
   stage.show()

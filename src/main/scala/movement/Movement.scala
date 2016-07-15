@@ -9,29 +9,23 @@ import movement.Direction.Direction
 object Movement {
   def moveEvent(id: Int, dir: Direction) = Event(id, moveFunction(dir, id))
 
-//  def moveFunction(dir: Direction): (GameState, Entity) => (Entity, Seq[Event]) = {
-//    case (s, e: Mover[_]) =>
-//      val newPos: Position = Position.movePos(dir)(e.pos)
-//      val collision = s.entities.collectFirst{ case e: Mover[_] if e.pos == newPos => e }
-//
-//      collision
-//        .map(collide(e))
-//        .getOrElse((e.pos(_ => newPos), Nil))
-//    case (_, e) => (e, Nil)
-//  }
-
-  def moveFunction(dir: Direction, id: Int): PartialFunction[(GameState, Entity),(Entity, Seq[Event])] = {
-    case (s, e: Mover[_]) =>
+  private def moveFunction(dir: Direction, id: Int): PartialFunction[Entity,(Entity, Seq[Event])] = {
+    case (e: Mover[_]) if e.id == id =>
       val newPos: Position = Position.movePos(dir)(e.pos)
-      val posID = s.entities.indexOf(newPos)
-      val f = Event(id, {case (_, e:Mover[_]) => (e.pos(_ => newPos), Nil)})
+      val f = Event(id, {case e:Mover[_] if e.id==id => (e.pos(_ => newPos), Nil)})
 
-      (e, Seq(Event(posID, withCheckCollision(f))))
+      (e, Seq(Event(0, withCheckCollision(newPos, e, f))))
   }
 
-  def withCheckCollision(f: Event): PartialFunction[(GameState, Entity),(Entity, Seq[Event])] = {
-    case (_, e: Position) =>
-      if(e.blocked) (e, Nil)
-      else (e.block, Seq(f))
+  private def withCheckCollision(pos: Position, entity: Mover[_], f: Event): PartialFunction[Entity,(Entity, Seq[Event])] = {
+    case (e: Position) if e ~= pos =>
+      if(e.blocked.isDefined) (e, Nil)
+      else (e.block(entity.id), Seq(f, unblockPosition(entity.pos, entity)))
   }
+
+  private def unblockPosition(pos: Position, entity: Entity) = Event(0,
+    {case (e: Position) if e ~= pos =>
+      (e.unblock(entity.id), Nil)
+    }
+  )
 }

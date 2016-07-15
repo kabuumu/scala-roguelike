@@ -5,12 +5,12 @@ import scala.annotation.tailrec
 /**
   * Created by rob on 29/06/16.
   */
-case class GameState(entities: Seq[Entity]) {
+case class GameState(entities: Iterable[Entity]) {
 
-  def processEvents(events: Seq[Event]): GameState = {
+  def processEvents(events: Iterable[Event]): GameState = {
 
     @tailrec
-    def eventLoop(entities: Seq[Entity], events:Seq[Event]): Seq[Entity] = {
+    def eventLoop(entities: Iterable[Entity], events:Iterable[Event]): Iterable[Entity] = {
       if(events.nonEmpty) {
         val (newEntities, newEvents) = processIteration(entities, events)
         eventLoop(newEntities, newEvents)
@@ -18,13 +18,13 @@ case class GameState(entities: Seq[Entity]) {
       else entities
     }
 
-    def processIteration(entities:Seq[Entity], events: Seq[Event]):(Seq[Entity], Seq[Event]) = {
-      entities.par.map { entity => val entityID = entities.indexOf(entity)
+    def processIteration(entities:Iterable[Entity], events: Iterable[Event]):(Iterable[Entity], Iterable[Event]) = {
+      entities.par.map { entity =>
         events
-        .filter(_.id == entityID)
+        .filter(_.isDefinedAt(entity))
         .foldLeft((entity, Seq[Event]())) {
           case ((e, s), f) =>
-            val (newE, newS) = f(this, e)
+            val (newE, newS) = f(e)
             (newE, newS ++ s)
         }
       }.foldLeft((Seq[Entity](), Seq[Event]())) {

@@ -22,7 +22,7 @@ object Main extends JFXApp {
 
   var lastDelta = 0
   var keyCode:KeyCode = null
-  var state:GameState = GameState(Seq(Actor(0, Position(0,0), Map(), isPC = true), Position(0,0), Position(0,1), Position(1,0), Position(1,1)))
+  var state:GameState = GameState(Seq(Actor(0, Position(0,0), Map(), isPC = true), Position(0,0), Position(0,1), Position(1,0), Position(1,1),Position(1,2)))
   val frameRate = 1 //200ms
 
   stage = new PrimaryStage {
@@ -39,6 +39,7 @@ object Main extends JFXApp {
   AnimationTimer { now: Long =>
     state = state.processEvents(Input(keyCode))
     Output.update(state, canvas)
+    keyCode = null
   }.start()
 
   stage.show()

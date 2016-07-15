@@ -1,8 +1,8 @@
 package main
 
-import events.GameState
+import events.{EventLock, GameState}
 import input.Input
-import movement.{Mover, Position}
+import movement.Position
 import state.Actor
 
 import scala.language.postfixOps
@@ -19,11 +19,15 @@ import scalafx.scene.input.{KeyCode, KeyEvent}
   */
 object Main extends JFXApp {
   val canvas = new Canvas(512, 512)
-
-  var lastDelta = 0
-  var keyCode:KeyCode = null
-  var state:GameState = GameState(Seq(Actor(0, Position(0,0), Map(), isPC = true), Position(0,0), Position(0,1), Position(1,0), Position(1,1),Position(1,2)))
   val frameRate = 1 //200ms
+  var lastDelta = 0
+  var keyCode: KeyCode = null
+  var state: GameState = GameState(
+    Seq(
+      Actor(0, Position(0, 0), Map(), isPC = true),
+      EventLock()
+    )
+  )
 
   stage = new PrimaryStage {
     title = "scala-roguelike"
@@ -31,7 +35,7 @@ object Main extends JFXApp {
       content = canvas
 
       onKeyPressed = {
-        key:KeyEvent => keyCode = key.code
+        key: KeyEvent => keyCode = key.code
       }
     }
   }

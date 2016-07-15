@@ -5,7 +5,7 @@ import input._
 import movement.Direction.Direction
 import movement.{Direction, Mover, Position}
 
-case class Actor(id: Int, pos: Position, attributes: Map[AttributeName, Attribute], isPC: Boolean) extends Mover[Actor] {
+case class Actor(id: Int, pos: Position, attributes: Map[AttributeName, Attribute], isPC: Boolean) extends Mover {
   def getCollision(pos: Position, state: GameState) = {
     state.getActor(pos)
       .filterNot(_ == this)
@@ -42,10 +42,6 @@ case class Actor(id: Int, pos: Position, attributes: Map[AttributeName, Attribut
 }
 
 object Actor {
-
-  import movement.Mover._
-  import movement.Position._
-
   def update(input: Input, state: GameState)(actor: Actor): Option[GameState] = {
     if (actor.get(INITIATIVE).current > 0) Some(state.mod(actor)(_.mod(INITIATIVE)(_.current(_ - 1))))
     else {

@@ -1,4 +1,4 @@
-package events
+package core
 
 /**
   * Created by rob on 15/07/16.
@@ -21,8 +21,8 @@ object EventLock{
   def lockingEvent(key: Entity, entity:Entity, successEvents: Seq[Event] = Nil, failEvents: Seq[Event] = Nil) = Event({
     case lock: EventLock =>
       lock
-        .get(key).map(_ => (lock, failEvents))
-        .getOrElse(lock + (key -> entity.id), successEvents)
+        .get(key).map(_ => (Iterable(lock), failEvents))
+        .getOrElse(Iterable(lock + (key -> entity.id)), successEvents)
     }
   )
 }

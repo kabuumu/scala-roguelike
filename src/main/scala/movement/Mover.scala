@@ -1,6 +1,6 @@
 package movement
 
-import events.Entity
+import core.Entity
 import movement.Direction.Direction
 import movement.Position._
 
@@ -12,5 +12,5 @@ trait Mover extends Entity{
 
   def pos(f: Position => Position): Mover
 
-  def move(dir: Direction): Mover = pos(_.movePos(dir))
+  def move(dir: Direction): Mover = pos(_.move(dir))
 }

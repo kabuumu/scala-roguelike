@@ -1,8 +1,8 @@
-package events
+package core
 
 /**
   * Created by rob on 29/06/16.
   */
-trait Entity{
+trait Entity {
   val id: Int
 }

@@ -1,8 +1,9 @@
 package movement
 
-import events.{Entity, Event, EventLock, GameState}
+import core.Event.EventReturn
+import core.{Entity, Event, EventLock, GameState}
 import movement.Direction.Direction
-import events.EventLock.lockingEvent
+import core.EventLock.lockingEvent
 
 /**
   * Created by rob on 01/07/16.
@@ -10,15 +11,15 @@ import events.EventLock.lockingEvent
 object Movement {
   def moveEvent(id: Int, dir: Direction) = Event(moveFunction(dir, id))
 
-  private def moveFunction(dir: Direction, id: Int): PartialFunction[Entity,(Entity, Seq[Event])] = {
+  private def moveFunction(dir: Direction, id: Int): PartialFunction[Entity,EventReturn] = {
     case (e: Mover) if e.id == id =>
-      val newPos: Position = e.pos.movePos(dir)
-      val f = Event{case e:Mover if e.id==id => (e.pos(_ => newPos), Nil)}
+      val newPos: Position = e.pos.move(dir)
+      val f = Event{case e:Mover if e.id==id => (Iterable(e.pos(_ => newPos)), Nil)}
 
-      (e, Seq(withCheckCollision(newPos, e, f)))
+      (Iterable(e), Seq(withCheckCollision(newPos, e, f)))
   }
 
   private def withCheckCollision(pos: Position, entity: Mover, f: Event) = lockingEvent(pos, entity, Seq(f, unblockPosition(entity.pos, entity)))
 
-  private def unblockPosition(pos: Position, entity: Entity) = Event{case lock: EventLock => (lock - pos, Nil)}
+  private def unblockPosition(pos: Position, entity: Entity) = Event{case lock: EventLock => (Iterable(lock - pos), Nil)}
 }

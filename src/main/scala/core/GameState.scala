@@ -1,4 +1,4 @@
-package events
+package core
 
 import scala.annotation.tailrec
 
@@ -20,14 +20,14 @@ case class GameState(entities: Iterable[Entity]) {
       entities.par.map { entity =>
         events
           .filter(_.isDefinedAt(entity))
-          .foldLeft((entity, Seq[Event]())) {
+          .foldLeft((Iterable(entity), Iterable[Event]())) {
             case ((e, s), f) =>
-              val (newE, newS) = f(e)
-              (newE, newS ++ s)
+              val (newE, newS) = f(e.head)
+              (newE, s ++ newS)
           }
-      }.foldLeft((Seq[Entity](), Seq[Event]())) {
+      }.foldLeft((Iterable[Entity](), Iterable[Event]())) {
         case ((ens, evs), (en, ev)) =>
-          (ens :+ en, evs ++ ev)
+          (ens ++ en, evs ++ ev)
       }
     }
 

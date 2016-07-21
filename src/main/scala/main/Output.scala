@@ -2,7 +2,7 @@ package main
 
 import movement.Position
 import state.Actor
-import events.GameState
+import core.GameState
 
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color

@@ -1,6 +1,6 @@
 package movement
 
-import events.Entity
+import core.Entity
 import movement.Direction.Direction
 
 /**
@@ -12,7 +12,7 @@ case class Position(x: Int, y: Int) extends Entity {
   def y(f: Int => Int): Position = copy(y = f(y))
   def ~= (pos: Position) = pos.x == x && pos.y == y
 
-  def movePos(dir: Direction): Position = dir match {
+  def move(dir: Direction): Position = dir match {
     case Direction.Up => y(_ - 1)
     case Direction.Down => y(_ + 1)
     case Direction.Right => x(_ + 1)

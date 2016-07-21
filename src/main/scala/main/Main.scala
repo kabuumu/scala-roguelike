@@ -1,6 +1,6 @@
 package main
 
-import events.{EventLock, GameState}
+import core.{EventLock, GameState}
 import input.Input
 import movement.Position
 import state.Actor
@@ -24,7 +24,7 @@ object Main extends JFXApp {
   var keyCode: KeyCode = null
   var state: GameState = GameState(
     Seq(
-      Actor(0, Position(0, 0), Map(), isPC = true),
+      new Actor(0, Position(0, 0)),
       EventLock()
     )
   )

@@ -1,4 +1,4 @@
-package events
+package core
 
 import movement._
 import org.scalatest.{FlatSpec, Matchers}
@@ -15,7 +15,7 @@ class GameStateSpec extends FlatSpec with Matchers {
   it should "when given an event which operates on an entity, modify that entity" in {
     case class TestEntity(id: Int, test: Boolean) extends Entity
     val entity = TestEntity(0, false)
-    val event = Event{case (e) => (TestEntity(0, true), Nil)}
+    val event = Event{case (e) => (Iterable(TestEntity(0, true)), Nil)}
     GameState(Seq(entity)).processEvents(Seq(event)) shouldBe GameState(Seq(TestEntity(0, true)))
   }
 
@@ -24,7 +24,7 @@ class GameStateSpec extends FlatSpec with Matchers {
     val entity = TestEntity(0, 0)
     val event = Event{
       case (e: TestEntity) if e.num == 1 =>
-        (TestEntity(0, 2), Seq(Event{ case (e) => (e, Nil) }))
+        (Iterable(TestEntity(0, 2)), Seq(Event{ case (e) => (Iterable(e), Nil) }))
     }
     GameState(Seq(entity)).processEvents(Seq(event)) shouldBe GameState(Seq(TestEntity(0, 0)))
   }
@@ -35,7 +35,7 @@ class GameStateSpec extends FlatSpec with Matchers {
     }
 
     val entity = TestMover(0, Position(0, 0))
-    val event = Event{ case (e: Mover) => (e.pos(_.movePos(Direction.Up)), Nil)}
+    val event = Event{ case (e: Mover) => (Iterable(e.pos(_.move(Direction.Up))), Nil)}
     val startingState = GameState(Seq(entity))
     startingState.processEvents(Seq(event)) shouldBe GameState(Seq(TestMover(0, Position(0, -1))))
 
@@ -48,12 +48,12 @@ class GameStateSpec extends FlatSpec with Matchers {
 
     lazy val event = new Event({
       case (e: TestEntity) if e.num == 0 =>
-        (TestEntity(0, 1), Seq(returnedEvent))
+        (Iterable(TestEntity(0, 1)), Seq(returnedEvent))
     })
 
     lazy val returnedEvent = new Event({
       case (e: TestEntity) if e.num == 1 =>
-        (TestEntity(0, 2), Nil)
+        (Iterable(TestEntity(0, 2)), Nil)
     })
 
     val startingState = GameState(Seq(entity))
@@ -71,18 +71,18 @@ class GameStateSpec extends FlatSpec with Matchers {
       //An event which triggers another event to check the num value of another entity, and create an updating event
       // if that check is successful
       case (e: TestEntity) if e.num == i =>
-        (e, Seq(checkN((bound - 1) - i, updateN(i))))
+        (Iterable(e), Seq(checkN((bound - 1) - i, updateN(i))))
     })
 
     def checkN(i: Int, f: Event) = Event{
       //An event which checks to see if an entity at seq(i) is entity(i)
       case (e: TestEntity) if e.id == i && e.num == i =>
-        (e, Seq(f))
+        (Iterable(e), Seq(f))
     }
 
     def updateN(i: Int) = Event{
       //An event which increments the num of an entity
-      case (e: TestEntity) if e.id == i && e.num == i => (TestEntity(i, i + 1), Nil)
+      case (e: TestEntity) if e.id == i && e.num == i => (Iterable(TestEntity(i, i + 1)), Nil)
     }
 
     val events = (0 until bound).map(event)

@@ -1,4 +1,4 @@
-package main
+package app
 
 import movement.Position
 import state.Actor

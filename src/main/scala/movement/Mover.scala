@@ -10,7 +10,11 @@ import movement.Position._
 trait Mover extends Entity{
   val pos: Position
 
+  val facing: Direction
+
   def pos(f: Position => Position): Mover
+
+  def facing(dir: Direction): Mover
 
   def move(dir: Direction): Mover = pos(_.move(dir))
 }

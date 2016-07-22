@@ -9,14 +9,12 @@ import core.EventLock.lockingEvent
   * Created by rob on 01/07/16.
   */
 object Movement {
-  def moveEvent(id: Int, dir: Direction) = Event(moveFunction(dir, id))
-
-  private def moveFunction(dir: Direction, id: Int): PartialFunction[Entity,EventReturn] = {
+  def moveEvent(id: Int, dir: Direction) = Event{
     case (e: Mover) if e.id == id =>
-      val newPos: Position = e.pos.move(dir)
+      val newPos: Position = if(e.facing==dir) e.pos.move(dir) else e.pos
       val f = Event{case e:Mover if e.id==id => (Iterable(e.pos(_ => newPos)), Nil)}
 
-      (Iterable(e), Seq(withCheckCollision(newPos, e, f)))
+      (Iterable(e.facing(dir)), Seq(withCheckCollision(newPos, e, f)))
   }
 
   private def withCheckCollision(pos: Position, entity: Mover, f: Event) = lockingEvent(pos, entity, Seq(f, unblockPosition(entity.pos, entity)))

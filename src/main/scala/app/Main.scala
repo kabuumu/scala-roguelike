@@ -2,7 +2,7 @@ package app
 
 import core.{EventLock, GameState}
 import input.Input
-import movement.Position
+import movement.{Direction, Position}
 import state.Actor
 
 import scala.language.postfixOps
@@ -24,7 +24,7 @@ object Main extends JFXApp {
   var keyCode: KeyCode = null
   var state: GameState = GameState(
     Seq(
-      new Actor(0, Position(0, 0)),
+      new Actor(0, Position(0, 0), Direction.Up),
       EventLock()
     )
   )

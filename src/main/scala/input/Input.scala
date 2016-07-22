@@ -1,6 +1,8 @@
 package input
 
-import movement.{Direction, Movement}
+import combat.Combat
+import movement.{Direction, Movement, Mover, Position}
+import state.Actor
 
 import scalafx.scene.input.KeyCode
 
@@ -19,7 +21,8 @@ object Input {
       case _ => null
     })
 
-    dir.map(dir => Movement.moveEvent(0, dir))
+    if(key == KeyCode.A) Some(Combat.projectileEvent(0, new Actor(1, Position(0,0), Direction.Up)))
+    else dir.map(dir => Movement.moveEvent(0, dir))
   }
 }
 

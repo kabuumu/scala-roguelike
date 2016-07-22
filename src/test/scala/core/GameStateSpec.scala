@@ -1,5 +1,6 @@
 package core
 
+import movement.Direction.Direction
 import movement._
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -30,8 +31,9 @@ class GameStateSpec extends FlatSpec with Matchers {
   }
 
   it should "move an entity when given a 'move command' event" in {
-    case class TestMover(id: Int, pos: Position) extends Mover {
+    case class TestMover(id: Int, pos: Position, facing: Direction = Direction.Up) extends Mover {
       override def pos(f: (Position) => Position): TestMover = copy(pos = f(pos))
+      override def facing(dir: Direction):TestMover = copy(facing = dir)
     }
 
     val entity = TestMover(0, Position(0, 0))
@@ -94,8 +96,9 @@ class GameStateSpec extends FlatSpec with Matchers {
   }
 
   "Movement Event" should "modify the position of an entity where it is free" in {
-    case class TestEntity(id: Int, pos: Position) extends Entity with Mover {
+    case class TestEntity(id: Int, pos: Position, facing: Direction = Direction.Up) extends Entity with Mover {
       override def pos(f: Position => Position) = copy(pos = f(pos))
+      override def facing(dir: Direction): TestEntity = copy(facing = dir)
     }
 
     val entity = TestEntity(0, Position(0, 0))
@@ -110,13 +113,15 @@ class GameStateSpec extends FlatSpec with Matchers {
   }
 
   it should "only allow the first of two entities to move to a position, when both receive an event to move there within the same frame" in {
-    case class TestEntity(id: Int, pos: Position) extends Entity with Mover {
+    case class TestEntity(id: Int, pos: Position, facing: Direction) extends Entity with Mover {
       override def pos(f: Position => Position) = copy(pos = f(pos))
+      override def facing(dir: Direction): TestEntity = copy(facing = dir)
+
     }
 
     val entities = Seq(
-      TestEntity(0, Position(0, 0)),
-      TestEntity(1, Position(2, 0)),
+      TestEntity(0, Position(0, 0), Direction.Right),
+      TestEntity(1, Position(2, 0), Direction.Left),
       EventLock()
     )
 
@@ -128,7 +133,7 @@ class GameStateSpec extends FlatSpec with Matchers {
     val res = GameState(entities)
       .processEvents(events)
 
-    res.entities should contain(TestEntity(0, Position(1,0)))
-    res.entities should contain(TestEntity(1, Position(2,0)))
+    res.entities should contain(TestEntity(0, Position(1,0), Direction.Right))
+    res.entities should contain(TestEntity(1, Position(2,0), Direction.Left))
   }
 }

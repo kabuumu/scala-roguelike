@@ -1,6 +1,6 @@
 package app
 
-import core.{EventLock, GameState}
+import core.{Entity, EventLock, GameState, Initiative}
 import input.Input
 import movement.{Direction, Position}
 import state.Actor
@@ -18,13 +18,15 @@ import scalafx.scene.input.{KeyCode, KeyEvent}
   * Created by rob on 13/04/16.
   */
 object Main extends JFXApp {
+  lazy val playerID: String = "pc"
+
   val canvas = new Canvas(512, 512)
   val frameRate = 1 //200ms
   var lastDelta = 0
   var keyCode: KeyCode = null
   var state: GameState = GameState(
     Seq(
-      new Actor(0, Position(0, 0), Direction.Up),
+      new {override val id = playerID} with Actor(Position(0, 0), Initiative(10), Direction.Up),
       EventLock()
     )
   )
@@ -41,7 +43,7 @@ object Main extends JFXApp {
   }
 
   AnimationTimer { now: Long =>
-    state = state.processEvents(Input(keyCode))
+    state = state.processEvents(Iterable(Entity.update) ++ Input(keyCode))
     Output.update(state, canvas)
     keyCode = null
   }.start()

@@ -1,16 +1,22 @@
 package core
 
+import java.util.UUID
+
 /**
   * Created by rob on 15/07/16.
   */
-class EventLock(map: Map[Entity, Int] = Map()) extends Map[Entity, Int] with Entity{
-  override val id: Int = -1
+class EventLock(map: Map[Entity, String] = Map()) extends Map[Entity, String] with Entity{
+  val id = "eventLock"
 
-  override def +[B1 >: Int](kv: (Entity, B1)): EventLock = new EventLock((map + kv).asInstanceOf[Map[Entity,Int]])
+  override val initiative = Initiative.defaultInitiative
 
-  override def get(key: Entity): Option[Int] = map.get(key)
+  override def initiative(f: Initiative => Initiative): EventLock = this
 
-  override def iterator: Iterator[(Entity, Int)] = map.iterator
+  override def +[B1 >: String](kv: (Entity, B1)): EventLock = new EventLock((map + kv).asInstanceOf[Map[Entity,String]])
+
+  override def get(key: Entity): Option[String] = map.get(key)
+
+  override def iterator: Iterator[(Entity, String)] = map.iterator
 
   override def -(key: Entity): EventLock = new EventLock(map - key)
 }

@@ -1,5 +1,6 @@
 package app
 
+import combat.Projectile
 import movement.Position
 import state.Actor
 import core.GameState
@@ -20,10 +21,13 @@ object Output {
 
     g2d.clearRect(0, 0, height, width)
 
-    g2d.setFill(Color.Green)
-
     state.entities.collect{
-      case a:Actor => g2d.fillRect(a.pos.x * size, a.pos.y * size, size, size)
+      case a:Actor =>
+        g2d.setFill(Color.Green)
+        g2d.fillRect(a.pos.x * size, a.pos.y * size, size, size)
+      case p:Projectile =>
+        g2d.setFill(Color.Red)
+        g2d.fillRect(p.pos.x * size, p.pos.y * size, size, size)
     }
   }
 }

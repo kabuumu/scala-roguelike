@@ -1,6 +1,8 @@
 package input
 
-import combat.Combat
+import app.Main
+import combat.{Combat, Projectile}
+import core.Initiative
 import movement.{Direction, Movement, Mover, Position}
 import state.Actor
 
@@ -21,8 +23,8 @@ object Input {
       case _ => null
     })
 
-    if(key == KeyCode.A) Some(Combat.projectileEvent(0, new Actor(1, Position(0,0), Direction.Up)))
-    else dir.map(dir => Movement.moveEvent(0, dir))
+    if(key == KeyCode.A) Some(Combat.projectileEvent(Main.playerID, new Projectile(Position(0,0), Direction.Up, Initiative(10))))
+    else dir.map(dir => Movement.moveEvent(Main.playerID, dir))
   }
 }
 

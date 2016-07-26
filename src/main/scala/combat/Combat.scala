@@ -1,14 +1,20 @@
 package combat
 
-import core.{Entity, Event, EventLock}
-import movement.{Movement, Mover}
+import core.Event
+import movement.Mover
 
 /**
   * Created by rob on 21/07/16.
   */
 object Combat {
-  def projectileEvent(id: Int, proj: Mover) = Event{
-    case e:Mover if e.id == id =>
-      (Iterable(e, proj.pos(_ => e.pos).move(e.facing)), Nil)
+  def projectileEvent(id: String, proj: Mover) = Event {
+    case e: Mover if e.id == id =>
+      (
+        Iterable(e, proj
+          .pos(_ => e.pos)
+          .facing(e.facing)
+          .move(e.facing)),
+        Nil
+        )
   }
 }

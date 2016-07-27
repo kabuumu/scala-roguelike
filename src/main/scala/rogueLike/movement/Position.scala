@@ -1,7 +1,8 @@
-package movement
+package rogueLike.movement
 
-import core.{Entity, Initiative}
-import movement.Direction.Direction
+import core.Entity
+import rogueLike.async.Initiative
+import rogueLike.movement.Direction.Direction
 
 /**
   * Created by rob on 26/04/16.

@@ -1,4 +1,4 @@
-package core
+package rogueLike.async
 
 /**
   * Created by rob on 22/07/16.
@@ -9,7 +9,7 @@ class Initiative private(val max: Int, val current: Int){
 }
 
 object Initiative {
-  val defaultInitiative = new Initiative(-1, -1)
+  val DEFAULT = new Initiative(-1, -1)
 
   def apply(value: Int) = new Initiative(value, value)
 }

@@ -1,9 +1,10 @@
-package app
+package ui.app
 
-import core.{Entity, EventLock, GameState, Initiative}
-import input.Input
-import movement.{Direction, Position}
-import state.Actor
+import core.{Entity, EventLock, GameState}
+import rogueLike.async.{Async, Initiative}
+import ui.input.Input
+import rogueLike.movement.{Direction, Position}
+import rogueLike.state.Actor
 
 import scala.language.postfixOps
 import scalafx.Includes._
@@ -43,7 +44,7 @@ object Main extends JFXApp {
   }
 
   AnimationTimer { now: Long =>
-    state = state.processEvents(Iterable(Entity.update) ++ Input(keyCode))
+    state = state.processEvents(Iterable(Async.update) ++ Input(keyCode))
     Output.update(state, canvas)
     keyCode = null
   }.start()

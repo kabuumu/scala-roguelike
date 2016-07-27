@@ -1,7 +1,7 @@
-package combat
+package rogueLike.combat
 
-import core.Event
-import movement.Mover
+import core.{Entity, Event}
+import rogueLike.movement.Mover
 
 /**
   * Created by rob on 21/07/16.
@@ -13,7 +13,8 @@ object Combat {
         Iterable(e, proj
           .pos(_ => e.pos)
           .facing(e.facing)
-          .move(e.facing)),
+          .move(e.facing)
+          .asInstanceOf[Entity with Mover]),
         Nil
         )
   }

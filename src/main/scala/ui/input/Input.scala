@@ -1,10 +1,10 @@
-package input
+package ui.input
 
-import app.Main
-import combat.{Combat, Projectile}
-import core.Initiative
-import movement.{Direction, Movement, Mover, Position}
-import state.Actor
+import rogueLike.async.Initiative
+import ui.app.Main
+import rogueLike.combat.{Combat, Projectile}
+import rogueLike.movement.{Direction, Movement, Mover, Position}
+import rogueLike.state.Actor
 
 import scalafx.scene.input.KeyCode
 

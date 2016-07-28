@@ -10,16 +10,25 @@ import rogueLike.movement.{Movement, Mover, Position}
 /**
   * Created by rob on 26/07/16.
   */
-case class Projectile(pos: Position, facing: Direction, override val initiative: Initiative, id: String = UUID.randomUUID().toString) extends Mover with Entity with HasInitiative{
-  override def facing(dir: Direction): Mover = copy(facing = dir)
+case class Projectile(pos: Position,
+                      facing: Direction,
+                      override val initiative: Initiative,
+                      id: String = UUID.randomUUID().toString,
+                      timer: Int = Expires.DEFAULT)
+  extends Mover with Entity with HasInitiative with Expires{
+  override def facing(dir: Direction): Projectile = copy(facing = dir)
 
-  override def pos(f: (Position) => Position): Mover = copy(pos = f(pos))
+  override def pos(f: (Position) => Position): Projectile = copy(pos = f(pos))
 
-  override def initiative(f: (Initiative) => Initiative): Entity = copy(initiative = f(initiative))
+  override def initiative(f: (Initiative) => Initiative): Projectile = copy(initiative = f(initiative))
+
+  override def timer(f: (Int) => Int): Projectile = copy(timer = f(timer))
 }
 
 object Projectile {
   def updateProjectile(id: String) = Event {
-    case e: Mover if e.id == id => (Iterable(e), Iterable(Movement.moveEvent(id, e.facing)))
+    case e: Projectile if e.id == id =>
+      if(e.timer==0) (Nil, Nil)
+      else (Iterable(e.timer(_ - 1)), Iterable(Movement.moveEvent(id, e.facing)))
   }
 }

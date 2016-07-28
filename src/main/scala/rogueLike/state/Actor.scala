@@ -8,9 +8,9 @@ import rogueLike.movement.{Mover, Position}
 case class Actor(pos: Position, override val initiative: Initiative, facing: Direction) extends Mover with Entity with HasInitiative {
   val id = "pc"
 
-  override def pos(f: Position => Position) = copy(pos = f(pos))
+  override def pos(f: Position => Position): Actor = copy(pos = f(pos))
 
-  override def initiative(f: Initiative => Initiative) = copy(initiative = f(initiative))
+  override def initiative(f: Initiative => Initiative): Actor = copy(initiative = f(initiative))
 
   override def facing(dir: Direction): Actor = copy(facing = dir)
 }

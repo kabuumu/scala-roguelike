@@ -2,10 +2,9 @@ package ui.input
 
 import core.Event
 import rogueLike.async.{HasInitiative, Initiative}
-import ui.app.Main
 import rogueLike.combat.{Combat, Projectile}
-import rogueLike.movement.{Direction, Movement, Mover, Position}
-import rogueLike.state.Actor
+import rogueLike.movement.{Direction, Movement, Position}
+import ui.app.Main
 
 import scalafx.scene.input.KeyCode
 
@@ -24,7 +23,7 @@ object Input {
       case _ => null
     })
 
-    if(key == KeyCode.A) Some(Combat.projectileEvent(Main.playerID, new Projectile(Position(0,0), Direction.Up, Initiative(10))))
+    if(key == KeyCode.A) Some(Combat.projectileEvent(Main.playerID, new Projectile(Position(0,0), Direction.Up, Initiative(3))))
     else dir.map(dir =>
       Event{case e:HasInitiative if e.id == Main.playerID && e.initiative.current == 0 => (Iterable(e.initiative(_.reset)), Some(Movement.moveEvent(Main.playerID, dir)))})
   }

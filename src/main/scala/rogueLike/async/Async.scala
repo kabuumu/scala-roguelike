@@ -9,7 +9,7 @@ import rogueLike.combat.Projectile
 object Async {
   val update: Event = Event {
     case e: HasInitiative if e.initiative.current == 0 =>
-      (Iterable(e.initiative(_.reset)), getUpdateEvent(e))
+      (Iterable(e), getUpdateEvent(e))
     case e: HasInitiative =>
       (Iterable(e.initiative(_.--)), Nil)
   }

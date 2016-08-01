@@ -1,6 +1,7 @@
 package ui.input
 
-import rogueLike.async.Initiative
+import core.Event
+import rogueLike.async.{HasInitiative, Initiative}
 import ui.app.Main
 import rogueLike.combat.{Combat, Projectile}
 import rogueLike.movement.{Direction, Movement, Mover, Position}
@@ -24,7 +25,8 @@ object Input {
     })
 
     if(key == KeyCode.A) Some(Combat.projectileEvent(Main.playerID, new Projectile(Position(0,0), Direction.Up, Initiative(10))))
-    else dir.map(dir => Movement.moveEvent(Main.playerID, dir))
+    else dir.map(dir =>
+      Event{case e:HasInitiative if e.id == Main.playerID && e.initiative.current == 0 => (Iterable(e.initiative(_.reset)), Some(Movement.moveEvent(Main.playerID, dir)))})
   }
 }
 

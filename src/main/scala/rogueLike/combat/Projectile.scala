@@ -29,6 +29,6 @@ object Projectile {
   def updateProjectile(id: String) = Event {
     case e: Projectile if e.id == id =>
       if(e.timer==0) (Nil, Nil)
-      else (Iterable(e.timer(_ - 1)), Iterable(Movement.moveEvent(id, e.facing)))
+      else (Iterable(e.timer(_ - 1).initiative(_.reset)), Iterable(Movement.moveEvent(id, e.facing)))
   }
 }

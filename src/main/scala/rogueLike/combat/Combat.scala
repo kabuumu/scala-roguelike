@@ -1,6 +1,7 @@
 package rogueLike.combat
 
 import core.{Entity, Event}
+import rogueLike.async.HasInitiative
 import rogueLike.movement.Mover
 
 /**
@@ -8,13 +9,12 @@ import rogueLike.movement.Mover
   */
 object Combat {
   def projectileEvent(id: String, proj: Mover) = Event {
-    case e: Mover if e.id == id =>
+    case e: Mover with HasInitiative if e.id == id =>
       (
-        Iterable(e, proj
+        Iterable(e.initiative(_.reset), proj
           .pos(_ => e.pos)
           .facing(e.facing)
-          .move(e.facing)
-          .asInstanceOf[Entity with Mover]),
+          .move(e.facing)),
         Nil
         )
   }

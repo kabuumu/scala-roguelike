@@ -6,3 +6,9 @@ package core
 trait Entity {
   val id: String
 }
+
+object Entity {
+  implicit def asEntity[T >: Entity](e: T): Entity ={
+    e.asInstanceOf[Entity]
+  }
+}

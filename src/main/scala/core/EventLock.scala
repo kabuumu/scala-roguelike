@@ -25,8 +25,8 @@ object EventLock{
   def lockingEvent(key: Entity, entity:Entity, successEvents: Seq[Event] = Nil, failEvents: Seq[Event] = Nil) = Event({
     case lock: EventLock =>
       lock
-        .get(key).map(_ => (Iterable(lock), failEvents))
-        .getOrElse(Iterable(lock + (key -> entity.id)), successEvents)
+          .get(key)
+          .fold(Iterable(lock + (key -> entity.id)), successEvents)(_ => (Iterable(lock), failEvents))
     }
   )
 }

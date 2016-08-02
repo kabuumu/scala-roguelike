@@ -2,15 +2,13 @@ package core
 
 import java.util.UUID
 
+import rogueLike.async.Initiative
+
 /**
   * Created by rob on 15/07/16.
   */
 class EventLock(map: Map[Entity, String] = Map()) extends Map[Entity, String] with Entity{
   val id = "eventLock"
-
-  override val initiative = Initiative.defaultInitiative
-
-  override def initiative(f: Initiative => Initiative): EventLock = this
 
   override def +[B1 >: String](kv: (Entity, B1)): EventLock = new EventLock((map + kv).asInstanceOf[Map[Entity,String]])
 
@@ -27,8 +25,8 @@ object EventLock{
   def lockingEvent(key: Entity, entity:Entity, successEvents: Seq[Event] = Nil, failEvents: Seq[Event] = Nil) = Event({
     case lock: EventLock =>
       lock
-        .get(key).map(_ => (Iterable(lock), failEvents))
-        .getOrElse(Iterable(lock + (key -> entity.id)), successEvents)
+          .get(key)
+          .fold(Iterable(lock + (key -> entity.id)), successEvents)(_ => (Iterable(lock), failEvents))
     }
   )
 }

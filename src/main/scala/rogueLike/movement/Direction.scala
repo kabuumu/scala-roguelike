@@ -1,6 +1,6 @@
-package movement
+package rogueLike.movement
 
-import input.Input
+import ui.input.Input
 
 /**
   * Created by rob on 21/06/16.

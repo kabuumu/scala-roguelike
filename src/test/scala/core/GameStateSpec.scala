@@ -1,7 +1,7 @@
 //package core
 //
-//import movement.Direction.Direction
-//import movement._
+//import rogueLike.movement.Direction.Direction
+//import rogueLike.movement._
 //import org.scalatest.{FlatSpec, Matchers}
 //
 ///**

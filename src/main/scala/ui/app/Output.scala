@@ -1,8 +1,8 @@
-package app
+package ui.app
 
-import combat.Projectile
-import movement.Position
-import state.Actor
+import rogueLike.combat.Projectile
+import rogueLike.movement.Position
+import rogueLike.state.Actor
 import core.GameState
 
 import scalafx.scene.canvas.Canvas

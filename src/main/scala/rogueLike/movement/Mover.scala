@@ -1,13 +1,11 @@
-package movement
+package rogueLike.movement
 
-import core.Entity
-import movement.Direction.Direction
-import movement.Position._
+import rogueLike.movement.Direction.Direction
 
 /**
   * Created by rob on 21/06/16.
   */
-trait Mover extends Entity{
+trait Mover {
   val pos: Position
 
   val facing: Direction

@@ -16,6 +16,9 @@ case class Projectile(pos: Position,
                       id: String = UUID.randomUUID().toString,
                       timer: Int = Expires.DEFAULT)
   extends Mover with Entity with HasInitiative with Expires{
+
+  val isBlocker = false
+
   override def facing(dir: Direction): Projectile = copy(facing = dir)
 
   override def pos(f: (Position) => Position): Projectile = copy(pos = f(pos))

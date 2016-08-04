@@ -2,7 +2,7 @@ package rogueLike.combat
 
 import java.util.UUID
 
-import core.{Entity, Event}
+import core.{Entity, Event, EventLock}
 import rogueLike.async.{HasInitiative, Initiative}
 import rogueLike.movement.Direction.Direction
 import rogueLike.movement.{Movement, Mover, Position}
@@ -16,6 +16,9 @@ case class Projectile(pos: Position,
                       id: String = UUID.randomUUID().toString,
                       timer: Int = Expires.DEFAULT)
   extends Mover with Entity with HasInitiative with Expires{
+
+  val isBlocker = false
+
   override def facing(dir: Direction): Projectile = copy(facing = dir)
 
   override def pos(f: (Position) => Position): Projectile = copy(pos = f(pos))
@@ -28,7 +31,7 @@ case class Projectile(pos: Position,
 object Projectile {
   def updateProjectile(id: String) = Event {
     case e: Projectile if e.id == id =>
-      if(e.timer==0) (Nil, Nil)
+      if(e.timer==0) (Nil, Seq(EventLock.unlock(e))) //TODO: Move delete code into separate class
       else (Iterable(e.timer(_ - 1).initiative(_.reset)), Iterable(Movement.moveEvent(id, e.facing)))
   }
 }

@@ -1,7 +1,7 @@
 package ui.app
 
 import rogueLike.combat.Projectile
-import rogueLike.movement.Position
+import rogueLike.movement.{Position, Wall}
 import rogueLike.state.Actor
 import core.GameState
 
@@ -22,12 +22,15 @@ object Output {
     g2d.clearRect(0, 0, height, width)
 
     state.entities.collect{
-      case a:Actor =>
+      case e:Actor =>
         g2d.setFill(Color.Green)
-        g2d.fillRect(a.pos.x * size, a.pos.y * size, size, size)
-      case p:Projectile =>
+        g2d.fillRect(e.pos.x * size, e.pos.y * size, size, size)
+      case e:Projectile =>
         g2d.setFill(Color.Red)
-        g2d.fillRect(p.pos.x * size, p.pos.y * size, size, size)
+        g2d.fillRect(e.pos.x * size, e.pos.y * size, size, size)
+      case e:Wall =>
+        g2d.setFill(Color.Black)
+        g2d.fillRect(e.pos.x * size, e.pos.y * size, size, size)
     }
   }
 }

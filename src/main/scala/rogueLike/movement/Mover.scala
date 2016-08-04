@@ -5,7 +5,7 @@ import rogueLike.movement.Direction.Direction
 /**
   * Created by rob on 21/06/16.
   */
-trait Mover {
+trait Mover extends HasPosition{
   val pos: Position
 
   val facing: Direction

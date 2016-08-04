@@ -3,6 +3,7 @@ package core
 import java.util.UUID
 
 import rogueLike.async.Initiative
+import rogueLike.movement.Position
 
 /**
   * Created by rob on 15/07/16.
@@ -29,4 +30,7 @@ object EventLock{
           .fold(Iterable(lock + (key -> entity.id)), successEvents)(_ => (Iterable(lock), failEvents))
     }
   )
+
+  def unlock(locker: Entity) =
+    Event { case lock: EventLock => (Iterable(lock.filterNot{case (k,v) => v == locker.id}), Nil) }
 }

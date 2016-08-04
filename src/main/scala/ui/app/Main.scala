@@ -1,8 +1,8 @@
 package ui.app
 
-import core.{EventLock, GameState}
+import core.{Event, EventLock, GameState}
 import rogueLike.async.{Async, HasInitiative, Initiative}
-import rogueLike.movement.{Direction, Position}
+import rogueLike.movement.{Direction, Position, Wall}
 import rogueLike.state.Actor
 import ui.input.Input
 
@@ -28,12 +28,15 @@ object Main extends JFXApp {
   var keyCode: KeyCode = null
   var state: GameState = GameState(
     Seq(
+      EventLock(),
       new {
         override val id = playerID
-      } with Actor(Position(0, 0), Initiative(20), Direction.Up),
-      EventLock()
+      }
+        with Actor(Position(0, 0), Initiative(20), Direction.Up),
+      Wall(Position(2, 0)), Wall(Position(2, 1)), Wall(Position(2, 2))
     )
   )
+    .processEvents(Seq(Event{ case e @ Wall(pos, _) => (Seq(e), Seq(EventLock.lockingEvent(pos, e)))}))
 
   stage = new PrimaryStage {
     title = "scala-roguelike"

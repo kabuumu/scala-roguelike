@@ -5,6 +5,9 @@ import scala.annotation.tailrec
 /**
   * Created by rob on 29/06/16.
   */
+
+//TODO: Make GameState constructor private and have companion object apply generate it with nil.
+//TODO: Add new predefined event for adding entities
 case class GameState(entities: Iterable[Entity]) {
   def processEvents(events: Iterable[Event]): GameState = {
     @tailrec

@@ -16,7 +16,9 @@ object Movement {
       (Iterable(e.facing(dir)), Seq(withCheckCollision(newPos, e.pos, e, f)))
   }
 
-  private def withCheckCollision(newPos: Position, oldPos: Position, entity: Entity, f: Event) = lockingEvent(newPos, entity, Seq(f, unblockPosition(oldPos, entity)))
+  private def withCheckCollision(newPos: Position, oldPos: Position, entity: Entity, f: Event) =
+    lockingEvent(newPos, entity, Seq(f, unblockPosition(oldPos, entity)))
 
-  private def unblockPosition(pos: Position, entity: Entity) = Event { case lock: EventLock => (Iterable(lock - pos), Nil) }
+  private def unblockPosition(pos: Position, entity: Entity) =
+    Event { case lock: EventLock => (Iterable(lock - pos), Nil) }
 }

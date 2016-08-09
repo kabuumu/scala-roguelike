@@ -9,16 +9,16 @@ import rogueLike.movement.Direction.Direction
   */
 object Movement {
   def moveEvent(id: String, dir: Direction) = Event {
-    case (e: Mover) if e.id == id =>
-      val newPos: Position = if (e.facing == dir) e.pos.move(dir) else e.pos
-      val f = Event { case e: Mover if e.id == id => (Iterable(e.pos(_ => newPos)), Nil) }
+    case (e: Position) if e.id == id =>
+      val newPos: Position = if (e.facing == dir) e.move(dir) else e
+      val f = Event { case e: Position if e.id == id => (Iterable(newPos), Nil) }
 
-      (Iterable(e.facing(dir)), Seq(withCheckCollision(newPos, e.pos, e, f)))
+      (Iterable(e.copy(facing = dir)), Seq(withCheckCollision(newPos, e, id, f)))
   }
 
-  private def withCheckCollision(newPos: Position, oldPos: Position, entity: Entity, f: Event) =
-    lockingEvent(newPos, entity, Seq(f, unblockPosition(oldPos, entity)))
+  private def withCheckCollision(newPos: Position, oldPos: Position, id: String, f: Event) =
+    lockingEvent(newPos, id, Seq(f, unblockPosition(oldPos)))
 
-  private def unblockPosition(pos: Position, entity: Entity) =
+  private def unblockPosition(pos: Position) =
     Event { case lock: EventLock => (Iterable(lock - pos), Nil) }
 }

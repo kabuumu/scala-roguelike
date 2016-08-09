@@ -1,9 +1,8 @@
 package ui.app
 
-import rogueLike.combat.Projectile
-import rogueLike.movement.{Position, Wall}
-import rogueLike.state.Actor
+import rogueLike.movement.Position
 import core.GameState
+import rogueLike.output.Sprite
 
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color
@@ -22,15 +21,11 @@ object Output {
     g2d.clearRect(0, 0, height, width)
 
     state.entities.collect{
-      case e:Actor =>
-        g2d.setFill(Color.Green)
-        g2d.fillRect(e.pos.x * size, e.pos.y * size, size, size)
-      case e:Projectile =>
-        g2d.setFill(Color.Red)
-        g2d.fillRect(e.pos.x * size, e.pos.y * size, size, size)
-      case e:Wall =>
-        g2d.setFill(Color.Black)
-        g2d.fillRect(e.pos.x * size, e.pos.y * size, size, size)
+      case sprite:Sprite =>
+        g2d.setFill(sprite.col)
+        state.entities
+          .collectFirst{case pos:Position if pos.id == sprite.id => pos}
+          .foreach(pos => g2d.fillRect(pos.x * size, pos.y * size, size, size))
     }
   }
 }

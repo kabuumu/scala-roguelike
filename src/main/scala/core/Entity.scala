@@ -1,5 +1,7 @@
 package core
 
+import java.util.UUID
+
 /**
   * Created by rob on 29/06/16.
   */
@@ -8,7 +10,5 @@ trait Entity {
 }
 
 object Entity {
-  implicit def asEntity[T >: Entity](e: T): Entity ={
-    e.asInstanceOf[Entity]
-  }
+  def createEntity(entities: (String => Entity)*)(implicit id: String = UUID.randomUUID().toString) = entities.map(_(id))
 }

@@ -30,7 +30,7 @@ object Main extends JFXApp {
   var keyCode: KeyCode = null
   var state: GameState = GameState(
     Seq(EventLock())
-      ++ createEntity(Sprite(Color.Blue, _), Initiative(20, _), Position(0, 0, Direction.Down, blocker = false, _))("pc")
+      ++ createEntity(Sprite(Color.Blue, _), Initiative(20, _), Position(0, 0, Direction.Down, blocker = false, _))(playerID)
       ++ createEntity(Sprite(Color.Black, _), Position(2, 0, Direction.Down, blocker = true, _))
       ++ createEntity(Sprite(Color.Black, _), Position(2, 1, Direction.Down, blocker = true, _))
       ++ createEntity(Sprite(Color.Black, _), Position(2, 2, Direction.Down, blocker = true, _))

@@ -9,13 +9,14 @@ import rogueLike.combat.Projectile
 object Async {
   val update: Event = Event {
     case e: Initiative if e.current == 0 =>
-      (Iterable(e), getUpdateEvent(e))
+      (Iterable(e), Seq(updateEvent(e.id)))
     case e: Initiative =>
       (Iterable(e.--), Nil)
   }
 
-  def getUpdateEvent(e: Entity): Option[Event] = e match {
-    case e: Projectile => Some(Projectile.updateProjectile(e.id))
-    case _ => None
+  def updateEvent(id: String): Event = {
+    Event {
+      case e: Projectile => (Seq(e), Seq(Projectile.updateProjectile(e.id)))
+    }
   }
 }

@@ -12,7 +12,7 @@ import rogueLike.movement.Position
 case class Projectile(id: String) extends Entity
 
 object Projectile {
-  def updateProjectile(id: String) = {
+  def update(id: String) = {
     Event {
       case e: Initiative if e.id == id => (Seq(e.reset), Nil)
       case e: Position if e.id == id => (Seq(e.move()), Nil)

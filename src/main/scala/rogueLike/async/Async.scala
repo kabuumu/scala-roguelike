@@ -1,5 +1,6 @@
 package rogueLike.async
 
+import core.Event._
 import core.{Entity, Event}
 import rogueLike.combat.Projectile
 
@@ -14,9 +15,5 @@ object Async {
       (Iterable(e.--), Nil)
   }
 
-  def updateEvent(id: String): Event = {
-    Event {
-      case e: Projectile => (Seq(e), Seq(Projectile.updateProjectile(e.id)))
-    }
-  }
+  def updateEvent(id: String): Event = filter({case Projectile(`id`) => true}, Projectile.update(id))
 }

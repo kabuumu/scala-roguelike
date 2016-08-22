@@ -15,5 +15,7 @@ object Async {
       (Iterable(e.--), Nil)
   }
 
-  def updateEvent(id: String): Event = filter({case Projectile(`id`) => true}, Projectile.update(id))
+  def updateEvent(id: String): Event = Event{
+    case e @ Projectile(`id`) => (Seq(e),Seq(Projectile.update(id)))
+  }
 }

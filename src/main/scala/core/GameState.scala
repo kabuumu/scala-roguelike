@@ -22,6 +22,7 @@ case class GameState(entities: Iterable[Entity]) {
     def processIteration(entities: Iterable[Entity], events: Iterable[Event]): (Iterable[Entity], Iterable[Event]) = {
       entities.par.map { entity =>
         events
+          .filter(_.isDefinedAt(entity))
           .foldLeft((Iterable(entity), Iterable[Event]())) {
             case ((e, s), f) =>
               val (newE, newS) = f(e.head)

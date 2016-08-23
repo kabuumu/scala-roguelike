@@ -1,10 +1,8 @@
 package ui.app
 
-import core.Entity._
 import core.{EventLock, GameState}
 import rogueLike.async.{Async, Initiative}
-import rogueLike.movement.{Direction, Position}
-import rogueLike.output.Sprite
+import rogueLike.data.Entities._
 import ui.input.Input
 
 import scala.language.postfixOps
@@ -15,7 +13,6 @@ import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.input.{KeyCode, KeyEvent}
-import scalafx.scene.paint.Color
 
 /**
   * Created by rob on 13/04/16.
@@ -30,10 +27,11 @@ object Main extends JFXApp {
   var keyCode: KeyCode = null
   var state: GameState = GameState(
     Seq(EventLock())
-      ++ createEntity(Sprite(Color.Blue, _), Initiative(20, _), Position(0, 0, Direction.Down, blocker = false, _))(playerID)
-      ++ createEntity(Sprite(Color.Black, _), Position(2, 0, Direction.Down, blocker = true, _))
-      ++ createEntity(Sprite(Color.Black, _), Position(2, 1, Direction.Down, blocker = true, _))
-      ++ createEntity(Sprite(Color.Black, _), Position(2, 2, Direction.Down, blocker = true, _))
+      ++ player(playerID, initiative = 20, x = 0, y = 0)
+      ++ wall(2, 0)
+      ++ wall(2, 1)
+      ++ wall(2, 2)
+      ++ enemy(25, 5, 5)
   )
   stage = new PrimaryStage {
     title = "scala-roguelike"

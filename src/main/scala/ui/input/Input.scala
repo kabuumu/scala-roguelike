@@ -27,7 +27,7 @@ object Input {
       case _ => null
     })
 
-    if(key == KeyCode.A) Some(Combat.projectileEvent("pc", createEntity(Projectile(_), Initiative(2, _), Position(0,0,Direction.Up, true, _), Sprite(Color.RED, _))))
+    if(key == KeyCode.A) Some(Combat.projectileEvent("pc", createEntity(Projectile(_), Initiative(2, _), Position(0,0,Direction.Up, isBlocker = true, _), Sprite(Color.RED, _))))
     else dir.map(dir =>
       Event{case e:Initiative if e.id == Main.playerID && e.current == 0 => (Iterable(e.reset), Some(Movement.moveEvent(Main.playerID, dir)))})
   }

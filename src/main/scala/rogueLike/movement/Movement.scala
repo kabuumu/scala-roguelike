@@ -1,7 +1,6 @@
 package rogueLike.movement
 
-import core.EventLock.lockingEvent
-import core.{Event, EventLock}
+import core.Event
 import rogueLike.movement.Direction._
 
 /**
@@ -14,17 +13,11 @@ object Movement {
   }
 
   private def moveFunction(id: String, e: Position, dir: Direction) = {
-    val newPos: Position = if (e.facing == dir) e.move(dir) else e.copy(facing = dir)
+    val newPos: Position = if (e.facing == dir) e.move(dir) else e
     val f = Event { case e: Position if e.id == id => (Iterable(newPos), Nil) }
 
-    (Iterable(e.copy(facing = dir)), Seq(withCheckCollision(newPos, e, id, f)))
+    (Iterable(newPos.copy(facing = dir, previous = Some(e.copy(previous = None)))), Nil)
   }
-
-  private def withCheckCollision(newPos: Position, oldPos: Position, id: String, f: Event) =
-    lockingEvent(newPos, id, Seq(f, unblockPosition(oldPos)))
-
-  private def unblockPosition(pos: Position) =
-    Event { case lock: EventLock => (Iterable(lock - pos), Nil) }
 
   def moveEvent(id: String, pos: Position) = Event {
     case e: Position if e.id == id =>
@@ -33,7 +26,7 @@ object Movement {
 
   private def getDirection(origin: Position, target: Position): Direction = {
     (origin, target) match {
-      case (Position(x1, y1, _, _, _), Position(x2, y2, _, _, _)) =>
+      case (Position(x1, y1, _, _, _, _), Position(x2, y2, _, _, _, _)) =>
         val xDiff = x1 - x2
         val yDiff = y1 - y2
 

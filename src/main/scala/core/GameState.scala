@@ -25,7 +25,7 @@ case class GameState(entities: Iterable[Entity]) {
           .filter(_.isDefinedAt(entity))
           .foldLeft((Iterable(entity), Iterable[Event]())) {
             case ((e, s), f) =>
-              val (newE, newS) = f(e.head)
+              val (newE, newS) = e.headOption.flatMap(f.lift).getOrElse(Nil, Nil)
               (newE, s ++ newS)
           }
       }.foldLeft((Iterable[Entity](), Iterable[Event]())) {

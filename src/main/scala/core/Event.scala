@@ -21,4 +21,8 @@ object Event {
   }
 
   def apply(f: F) = new Event(f)
+
+  def delete(id: String) = Event{
+    case e if e.id == id => (Nil, Nil)
+  }
 }

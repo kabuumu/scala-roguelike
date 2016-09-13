@@ -15,4 +15,8 @@ object Enemy {
         Movement.moveEvent(id, _)
       )
     )
+
+  def collide(aID: String, bID: String) = Event {
+    case e@Player(`bID`) => (Seq(e), Seq(delete(`bID`)))
+  }
 }

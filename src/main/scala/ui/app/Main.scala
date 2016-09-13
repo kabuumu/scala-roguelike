@@ -1,8 +1,9 @@
 package ui.app
 
-import core.{EventLock, GameState}
-import rogueLike.async.{Async, Initiative}
+import core.GameState
+import rogueLike.async.Async
 import rogueLike.data.Entities._
+import rogueLike.movement.Collision
 import ui.input.Input
 
 import scala.language.postfixOps
@@ -20,18 +21,17 @@ import scalafx.scene.input.{KeyCode, KeyEvent}
 object Main extends JFXApp {
   lazy val playerID: String = "pc"
 
-  val canvas = new Canvas(512, 512)
+  val canvas = new Canvas(544, 544)
   val frameRate = 1
   //200ms
   var lastDelta = 0
   var keyCode: KeyCode = null
   var state: GameState = GameState(
-    Seq(EventLock())
-      ++ player(playerID, initiative = 20, x = 0, y = 0)
+    player(playerID, initiative = 18, x = 0, y = 0)
       ++ wall(2, 0)
       ++ wall(2, 1)
       ++ wall(2, 2)
-      ++ enemy(25, 5, 5)
+      ++ enemy(36, 5, 5)
   )
   stage = new PrimaryStage {
     title = "scala-roguelike"
@@ -46,12 +46,8 @@ object Main extends JFXApp {
 
   AnimationTimer { now: Long =>
     state = state.processEvents(
-      Some(Async.update)
-        .filter(_ => state.entities.exists {
-          case e: Initiative =>
-            e.id == playerID && e.current > 0
-          case _ => false
-        }) ++ Input(keyCode))
+      Seq(Async.update) ++ Input(keyCode))
+      .processEvents(Seq(Collision.collisionDetector))
     Output.update(state, canvas)
     keyCode = null
   }.start()

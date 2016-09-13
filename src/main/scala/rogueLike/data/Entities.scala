@@ -13,18 +13,18 @@ object Entities {
     Player(_),
     Sprite(Color.Blue, _),
     Initiative(initiative, _),
-    Position(x, y, Direction.Down, blocker = false, _)
+    Position(x, y, Direction.Down, isBlocker = true, _)
   )(playerID)
 
   def enemy(initiative: Int, x: Int, y: Int) = createEntity(
     Enemy(_),
     Sprite(Color.Green, _),
     Initiative(initiative, _),
-    Position(x, y, Direction.Left, blocker = false, _)
+    Position(x, y, Direction.Left, isBlocker = true, _)
   )
 
   def wall(x: Int, y: Int) = createEntity(
     Sprite(Color.Black, _),
-    Position(x, y, Direction.Down, blocker = true, _)
+    Position(x, y, Direction.Down, isBlocker = true, _)
   )
 }

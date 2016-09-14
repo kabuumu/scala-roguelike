@@ -1,21 +1,21 @@
 package rogueLike.combat
 
 import core.{Entity, Event}
-import rogueLike.async.HasInitiative
-import rogueLike.movement.Mover
+import rogueLike.async.Initiative
+import rogueLike.movement.{Movement, Position}
 
 /**
   * Created by rob on 21/07/16.
   */
 object Combat {
-  def projectileEvent(id: String, proj: Mover) = Event {
-    case e: Mover with HasInitiative if e.id == id =>
-      (
-        Iterable(e.initiative(_.reset), proj
-          .pos(_ => e.pos)
-          .facing(e.facing)
-          .move(e.facing)),
-        Nil
+  def projectileEvent(id: String, proj: Iterable[Entity]) = Event {
+    case e: Position if e.id == id =>
+      (proj ++ Iterable(e),
+        Iterable(Event {
+          case pos: Position if proj.exists(_.id == pos.id) =>
+            (Iterable(pos.copy(x = e.x, y = e.y, facing = e.facing)), Iterable(Movement.moveEvent(pos.id, e.facing)))
+          case e: Initiative if e.id == id => (Seq(e.reset), Nil)
+        })
         )
   }
 }

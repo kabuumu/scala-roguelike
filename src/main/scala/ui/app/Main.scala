@@ -1,9 +1,9 @@
 package ui.app
 
-import core.{Event, EventLock, GameState}
-import rogueLike.async.{Async, HasInitiative, Initiative}
-import rogueLike.movement.{Direction, Position, Wall}
-import rogueLike.state.Actor
+import core.GameState
+import rogueLike.async.Async
+import rogueLike.data.Entities._
+import rogueLike.movement.Collision
 import ui.input.Input
 
 import scala.language.postfixOps
@@ -21,23 +21,18 @@ import scalafx.scene.input.{KeyCode, KeyEvent}
 object Main extends JFXApp {
   lazy val playerID: String = "pc"
 
-  val canvas = new Canvas(512, 512)
+  val canvas = new Canvas(544, 544)
   val frameRate = 1
   //200ms
   var lastDelta = 0
   var keyCode: KeyCode = null
   var state: GameState = GameState(
-    Seq(
-      EventLock(),
-      new {
-        override val id = playerID
-      }
-        with Actor(Position(0, 0), Initiative(20), Direction.Up),
-      Wall(Position(2, 0)), Wall(Position(2, 1)), Wall(Position(2, 2))
-    )
+    player(playerID, initiative = 18, x = 0, y = 0)
+      ++ wall(2, 0)
+      ++ wall(2, 1)
+      ++ wall(2, 2)
+      ++ enemy(36, 5, 5)
   )
-    .processEvents(Seq(Event{ case e @ Wall(pos, _) => (Seq(e), Seq(EventLock.lockingEvent(pos, e)))}))
-
   stage = new PrimaryStage {
     title = "scala-roguelike"
     scene = new Scene {
@@ -51,12 +46,8 @@ object Main extends JFXApp {
 
   AnimationTimer { now: Long =>
     state = state.processEvents(
-      Some(Async.update)
-        .filter(_ => state.entities.exists {
-          case e: HasInitiative =>
-            e.id == playerID && e.initiative.current > 0
-          case _ => false
-        }) ++ Input(keyCode))
+      Seq(Async.update) ++ Input(keyCode))
+      .processEvents(Seq(Collision.collisionDetector))
     Output.update(state, canvas)
     keyCode = null
   }.start()

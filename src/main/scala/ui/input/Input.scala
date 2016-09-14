@@ -1,9 +1,13 @@
 package ui.input
 
-import core.Event
-import rogueLike.async.{HasInitiative, Initiative}
+import javafx.scene.paint.Color
+
+import core.Entity._
+import core.{Entity, Event}
+import rogueLike.async.Initiative
 import rogueLike.combat.{Combat, Projectile}
 import rogueLike.movement.{Direction, Movement, Position}
+import rogueLike.output.Sprite
 import ui.app.Main
 
 import scalafx.scene.input.KeyCode
@@ -23,9 +27,9 @@ object Input {
       case _ => null
     })
 
-    if(key == KeyCode.A) Some(Combat.projectileEvent(Main.playerID, new Projectile(Position(0,0), Direction.Up, Initiative(3))))
+    if(key == KeyCode.A) Some(Combat.projectileEvent("pc", createEntity(Projectile(_), Initiative(2, _), Position(0,0,Direction.Up, isBlocker = true, _), Sprite(Color.RED, _))))
     else dir.map(dir =>
-      Event{case e:HasInitiative if e.id == Main.playerID && e.initiative.current == 0 => (Iterable(e.initiative(_.reset)), Some(Movement.moveEvent(Main.playerID, dir)))})
+      Event{case e:Initiative if e.id == Main.playerID && e.current == 0 => (Iterable(e.reset), Some(Movement.moveEvent(Main.playerID, dir)))})
   }
 }
 

@@ -16,9 +16,10 @@ object Event {
   type F = PartialFunction[In, EventReturn]
   type EventReturn = (Iterable[Entity], Iterable[Event])
 
-  def get[T](getter: PartialFunction[Entity, T])(events: (T => Event)*) = Event {
-    case e:Entity => (Seq(e), events.flatMap(ev => getter.lift(e).map(ev)))
-  }
+  def get(f: PartialFunction[Entity, Event])= Event{
+    case e =>
+      (Seq(e), f.lift(e))
+    }
 
   def apply(f: F) = new Event(f)
 

@@ -1,23 +1,25 @@
 package rogueLike.los
 
-import core.Entity
+import core.{Entity, Event}
 import rogueLike.movement.Position
 
 /**
   * Created by rob on 14/09/16.
   */
 object LineOfSight {
-  def losBlocked(origin: Position, target: Position, entities: Set[Entity]): Option[Position] = {
+  def losBlocked(origin: Position, target: Position, entities: Iterable[Entity]): Option[Position] = {
     val line = drawLine(origin.x, origin.y, target.x, target.y)
 
-    for{
-      pos <- entities.collectFirst{
-        case pos: Position if line.contains((pos.x, pos.y)) => pos
+    val res = for{
+      pos <- entities.collectFirst {
+        case pos: Position if line.contains((pos.x, pos.y)) && pos != origin && pos != target => pos
       }
-      blocker <- entities.collectFirst{
+      blocker <- entities.collectFirst {
         case blocker: Entity if blocker.id == pos.id => blocker
       }
     } yield pos
+
+    res
   }
 
   def drawLine(origX: Int, origY: Int, targX: Int, targY: Int): Seq[(Int, Int)] = {
@@ -41,10 +43,4 @@ object LineOfSight {
 
     loop(origX, origY, targX, targY, err, Nil)
   }
-
-//  def test: Unit = {
-//    class Test
-//
-//    val testEntity = new Test with Entity
-//  }
 }

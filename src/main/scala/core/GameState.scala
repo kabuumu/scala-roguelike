@@ -22,10 +22,10 @@ case class GameState(entities: Iterable[Entity]) {
     def processIteration(entities: Iterable[Entity], events: Iterable[Event]): (Iterable[Entity], Iterable[Event]) = {
       entities.par.map { entity =>
         events
-          .filter(_.isDefinedAt(entity))
+          .filter(_.isDefinedAt(this, entity))
           .foldLeft((Iterable(entity), Iterable[Event]())) {
             case ((e, s), f) =>
-              val (newE, newS) = e.headOption.flatMap(f.lift).getOrElse(Nil, Nil)
+              val (newE, newS) = e.headOption.flatMap(f.lift(this, _)).getOrElse(Nil, Nil)
               (newE, s ++ newS)
           }
       }.foldLeft((Iterable[Entity](), Iterable[Event]())) {

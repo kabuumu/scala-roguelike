@@ -21,17 +21,17 @@ import scalafx.scene.input.{KeyCode, KeyEvent}
 object Main extends JFXApp {
   lazy val playerID: String = "pc"
 
-  val canvas = new Canvas(544, 544)
+  val canvas = new Canvas(800, 640)
   val frameRate = 1
   //200ms
-  var lastDelta = 0
+  var lastDelta = 0L
   var keyCode: KeyCode = null
   var state: GameState = GameState(
-    player(playerID, initiative = 18, x = 0, y = 0)
+    player(playerID, initiative = 20, x = 0, y = 0)
       ++ wall(2, 0)
       ++ wall(2, 1)
       ++ wall(2, 2)
-      ++ enemy(36, 5, 5)
+      ++ enemy(25, 5, 5)
   )
   stage = new PrimaryStage {
     title = "scala-roguelike"
@@ -45,11 +45,14 @@ object Main extends JFXApp {
   }
 
   AnimationTimer { now: Long =>
-    state = state.processEvents(
-      Seq(Async.update) ++ Input(keyCode))
-      .processEvents(Seq(Collision.collisionDetector))
-    Output.update(state, canvas)
-    keyCode = null
+    if(lastDelta < now - 1000000000/150) {
+      state = state.processEvents(
+        Seq(Async.update) ++ Input(keyCode))
+        .processEvents(Seq(Collision.collisionDetector))
+      new Output(state, canvas).update()
+      keyCode = null
+      lastDelta = now
+    }
   }.start()
 
   stage.show()

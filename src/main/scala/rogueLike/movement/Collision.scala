@@ -2,24 +2,30 @@ package rogueLike.movement
 
 import core.Event
 import core.Event._
+import core.util.EventHelpers._
+import core.util.EntityHelpers._
 import rogueLike.actors.Enemy
-import rogueLike.combat.Projectile
+import rogueLike.combat.{Attack, Combat, Projectile}
 
 /**
   * Created by rob on 24/08/16.
   */
 object Collision {
   lazy val collisionDetector: Event =
-    get { case a: Position if a.isBlocker =>
-        get { case b: Position if a.id != b.id && (a.x, a.y) == (b.x, b.y) && b.isBlocker =>
-            collisionEvent(a.id, b.id)
-        }
+    Event{ case (s, a: Position) if a.isBlocker =>
+      (Seq(a), s.entities.collectFirst{case b: Position if a.id != b.id && (a.x, a.y) == (b.x, b.y) && b.isBlocker =>
+        collisionEvent(a.id, b.id)})
     }
 
   def collisionEvent(aID: String, bID: String) = Event {
-    case e@Projectile(`aID`) => (Seq(e), Seq(Projectile.collide(aID, bID)))
-    case e@Enemy(`aID`) => (Seq(e), Seq(Enemy.collide(aID, bID)))
-    case e: Position if e.id == aID => (Seq(e.previous.getOrElse(e)), Nil)
+    case (s, e@Projectile(`bID`)) => {
+      val attackEvent = for{
+        attackEntity <- s.entities.findEntity[Attack](_.id==`bID`)
+      } yield Combat.getHit(aID, attackEntity)
+
+      EventOutput(e) withEvents attackEvent withEvents Event.delete(bID)
+    }
+    case (s, e: Position) if e.id == aID && s.entities.findEntity[Projectile](_.id==bID).isEmpty => (Seq(e.previous.getOrElse(e)), Nil)
   }
 }
 

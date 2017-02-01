@@ -2,6 +2,7 @@ package rogueLike.combat
 
 import core.{Entity, Event}
 import rogueLike.async.Initiative
+import rogueLike.health.Health
 import rogueLike.movement.{Movement, Position}
 
 /**
@@ -9,13 +10,15 @@ import rogueLike.movement.{Movement, Position}
   */
 object Combat {
   def projectileEvent(id: String, proj: Iterable[Entity]) = Event {
-    case e: Position if e.id == id =>
+    case (_, e: Position) if e.id == id =>
       (proj ++ Iterable(e),
         Iterable(Event {
-          case pos: Position if proj.exists(_.id == pos.id) =>
+          case (_, pos: Position) if proj.exists(_.id == pos.id) =>
             (Iterable(pos.copy(x = e.x, y = e.y, facing = e.facing)), Iterable(Movement.moveEvent(pos.id, e.facing)))
-          case e: Initiative if e.id == id => (Seq(e.reset), Nil)
+          case (_, e: Initiative) if e.id == id => (Seq(e.reset), Nil)
         })
         )
   }
+
+  def getHit(id: String, attack: Attack) = Health.decreaseHealthEvent(id, attack.damage)
 }

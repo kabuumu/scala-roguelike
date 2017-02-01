@@ -10,17 +10,19 @@ import rogueLike.combat.Projectile
 object Async {
   val update: Event =
     Event.get {
-      case Player(id) =>
-        Event { case e: Initiative if e.id == id && e.current > 0 => (Seq(e), Seq(Event {
-          case e: Initiative if e.current == 0 =>
-            (Iterable(e), Seq(updateEvent(e.id)))
-          case e: Initiative =>
-            (Iterable(e.--), Nil)
-        }))}
+      case (_, Player(pid)) =>
+        Event.get { case (_, e: Initiative) if e.id == pid && e.current > 0 =>
+          Event {
+            case (_, e: Initiative) if e.current == 0 =>
+              (Iterable(e), Seq(updateEvent(e.id)))
+            case (_, e: Initiative) =>
+              (Iterable(e.--), Nil)
+          }
+        }
     }
 
   def updateEvent(id: String): Event = Event {
-    case e@Projectile(`id`) => (Seq(e), Seq(Projectile.update(id)))
-    case e@Enemy(`id`) => (Seq(e), Seq(Enemy.update(id)))
+    case (_, e@Projectile(`id`)) => (Seq(e), Seq(Projectile.update(id)))
+    case (_, e@Enemy(`id`)) => (Seq(e), Seq(Enemy.update(id)))
   }
 }

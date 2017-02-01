@@ -6,6 +6,7 @@ import core.Entity._
 import core.{Entity, Event}
 import rogueLike.async.Initiative
 import rogueLike.combat.{Combat, Projectile}
+import rogueLike.data.Entities
 import rogueLike.movement.{Direction, Movement, Position}
 import rogueLike.output.Sprite
 import ui.app.Main
@@ -27,9 +28,9 @@ object Input {
       case _ => null
     })
 
-    if(key == KeyCode.A) Some(Combat.projectileEvent("pc", createEntity(Projectile(_), Initiative(2, _), Position(0,0,Direction.Up, isBlocker = true, _), Sprite(Color.RED, _))))
+    if(key == KeyCode.A) Some(Combat.projectileEvent("pc", Entities.playerProjectile))
     else dir.map(dir =>
-      Event{case e:Initiative if e.id == Main.playerID && e.current == 0 => (Iterable(e.reset), Some(Movement.moveEvent(Main.playerID, dir)))})
+      Event{case (_, e:Initiative) if e.id == Main.playerID && e.current == 0 => (Iterable(e.reset), Some(Movement.moveEvent(Main.playerID, dir)))})
   }
 }
 

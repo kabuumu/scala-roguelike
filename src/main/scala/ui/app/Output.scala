@@ -3,6 +3,8 @@ package ui.app
 import core.GameState
 import core.util.EntityHelpers._
 import rogueLike.actors.Player
+import rogueLike.async.Initiative
+import rogueLike.health.Health
 import rogueLike.movement.{Direction, Position}
 import rogueLike.output.Sprite
 
@@ -25,19 +27,20 @@ class Output(state: GameState, canvas: Canvas) {
   val yOffset = (gameArea.height / size) / 2 - 1
 
   def update(): Unit = {
-    g2d.clearRect(0, 0, gameArea.width, gameArea.height)
+    g2d.clearRect(0, 0, canvas.getWidth, canvas.getHeight)
     g2d.setFill(Color.Black)
-    g2d.fillRect(0, 0, gameArea.width, gameArea.height)
+    g2d.fillRect(0, 0, canvas.getWidth, canvas.getHeight)
 
-    val (playerX, playerY) = state
+    val (playerX, playerY, playerID) = state
       .entities
       .findEntity[Position]()
       .where[Player]()
       .headOption
-      .map(pos => (pos.x, pos.y))
+      .map(pos => (pos.x, pos.y, pos.id))
       .get //Will crash if player does not exist
 
     drawEntities(playerX, playerY)
+    drawPlayerDetails(playerID)
   }
 
   def drawEntities(playerX: Int, playerY: Int) = {
@@ -87,6 +90,25 @@ class Output(state: GameState, canvas: Canvas) {
                 )
             }
           }
+    }
+  }
+
+  def drawPlayerDetails(playerID: String) = {
+    val entities = state.entities
+
+    for{
+      health <- entities.findEntity[Health](_.id == playerID)
+      initiative <- entities.findEntity[Initiative](_.id == playerID)
+    } {
+      g2d.setFill((health.current, health.max) match {
+        case (c, m) if c == m => Color.Green
+        case (c, m) if c > m / 2 => Color.Yellow
+        case _ => Color.Red
+      })
+
+      g2d.fillText(s"HP - ${health.current}/${health.max}", gameArea.width + size, size)
+      g2d.fillText(s"I  - ${initiative.current}/${initiative.max}", gameArea.width + size, size * 2)
+
     }
   }
 

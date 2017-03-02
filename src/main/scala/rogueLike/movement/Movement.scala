@@ -1,35 +1,35 @@
 package rogueLike.movement
 
-import core.refactor.EntityUpdate
+import core.Event
 import core.util.EntityHelpers._
 import core.util.EventHelpers._
-import core.{Event, GameState}
 import rogueLike.movement.Direction._
 
 /**
   * Created by rob on 01/07/16.
   */
 object Movement {
-  def moveEvent(id: String, dir: Direction) = Event {
-    case (_, e: Position) if e.id == id => EventOutput(moveFunction(e, dir))
+  def moveEvent(id: String, dir: Direction): Event = Event {
+    case (s, e: Position) if e.id == id =>
+      val facing = s.entities.findEntity[Facing](_.id == e.id).head.direction
+      val newPos: Position =
+        (if (facing == dir) {
+          e.move(dir)
+        } else {
+          e
+        }).copy(previous = Some(e.copy(previous = None)))
+
+      EventOutput(newPos).withEvents(Event{ case (_, e:Facing) if e.id == id => EventOutput(e.copy(direction = facing)) })
   }
 
-  def moveFunction(e: Position, dir: Direction): Position = {
-    val newPos: Position = if (e.facing == dir) e.move(dir) else e
-
-    newPos.copy(facing = dir, previous = Some(e.copy(previous = None)))
-  }
-
-  def moveEvent(id: String, pos: Position) = Event {
+  def moveEvent(id: String, pos: Position): Event = Event {
     case (_, e: Position) if e.id == id =>
-      (Seq(moveFunction(e, getDirection(e, pos))), Nil)
+      EventOutput(e).withEvents(moveEvent(id, getDirection(e, pos)))
   }
-
-  def move(direction: Direction) = moveFunction(_:Position, direction)
 
   def getDirection(origin: Position, target: Position): Direction = {
     (origin, target) match {
-      case (Position(x1, y1, _, _, _, _), Position(x2, y2, _, _, _, _)) =>
+      case (Position(x1, y1, _, _), Position(x2, y2, _, _)) =>
         val xDiff = x1 - x2
         val yDiff = y1 - y2
 

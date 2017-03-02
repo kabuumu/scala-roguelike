@@ -5,7 +5,7 @@ import core.util.EntityHelpers._
 import rogueLike.actors.Player
 import rogueLike.async.Initiative
 import rogueLike.health.Health
-import rogueLike.movement.{Direction, Position}
+import rogueLike.movement.{Direction, Facing, Position}
 import rogueLike.output.Sprite
 
 import scalafx.scene.canvas.Canvas
@@ -62,7 +62,7 @@ class Output(state: GameState, canvas: Canvas) {
             val centerY = bottom - (size / 2)
             val top = bottom - size
 
-            pos.facing match {
+            state.entities.findEntity[Facing](_.id == pos.id).head.direction match {
 
               case Direction.Right =>
                 g2d.fillPolygon(

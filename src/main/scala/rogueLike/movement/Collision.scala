@@ -13,9 +13,15 @@ import rogueLike.health.Health
   */
 object Collision {
   lazy val collisionDetector: Event =
-    Event{ case (s, a: Position) if a.isBlocker =>
-      (Seq(a), s.entities.collectFirst{case b: Position if a.id != b.id && (a.x, a.y) == (b.x, b.y) && b.isBlocker =>
-        collisionEvent(a.id, b.id)})
+    Event{ case (s, a: Position) =>
+      val es = s.entities
+
+      val events = for{
+        aBlocker <- es.findEntity[Blocker](_.id == a.id)
+        bBlocker <- es.findEntity[Blocker]().where[Position](b => a.id != b.id && (a.x, a.y) == (b.x, b.y))
+      } yield collisionEvent(aBlocker.id, bBlocker.id)
+
+      EventOutput(a).withEvents(events)
     }
 
   def collisionEvent(aID: String, bID: String) = Event {

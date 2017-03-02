@@ -22,11 +22,8 @@ object Enemy {
             .findEntity[Position]().where[Player]()
             .filterNot(target => LineOfSight.losBlocked(ePos, target, s.entities).isDefined)
             .reduceOption(getNearest(ePos))
-        } yield moveFunction(ePos, getDirection(ePos, target))
+        } yield moveEvent(ePos.id, getDirection(ePos, target))
 
-        event match {
-          case Some(_) => EventOutput(event)
-          case None => EventOutput(ePos)
-        }
+        EventOutput(ePos).withEvents(event)
     }
 }

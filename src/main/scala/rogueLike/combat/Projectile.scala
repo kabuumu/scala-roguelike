@@ -1,9 +1,9 @@
 package rogueLike.combat
 
+import core.util.EntityHelpers._
 import core.{Entity, Event}
 import rogueLike.async.Initiative
-import rogueLike.health.Health
-import rogueLike.movement.Position
+import rogueLike.movement.{Facing, Position}
 
 /**
   * Created by rob on 26/07/16.
@@ -16,7 +16,10 @@ object Projectile {
   def update(id: String) = {
     Event {
       case (_, e: Initiative) if e.id == id => (Seq(e.reset), Nil)
-      case (_, e: Position) if e.id == id => (Seq(e.move()), Nil)
+      case (s, e: Position) if e.id == id =>
+        val facing = s.entities.findEntity[Facing](_.id == id).head
+
+        (Seq(e.move(facing.direction)), Nil)
     }
   }
 }

@@ -8,7 +8,8 @@ libraryDependencies ++= Seq(
   "org.scalafx" %% "scalafx" % "8.0.102-R11",
   "org.scalactic" %% "scalactic" % "3.0.1",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-  "com.chuusai" %% "shapeless" % "2.3.2"
+  "com.chuusai" %% "shapeless" % "2.3.2",
+  "org.typelevel" %% "cats" % "0.9.0"
 )
 
 resolvers ++= Seq(

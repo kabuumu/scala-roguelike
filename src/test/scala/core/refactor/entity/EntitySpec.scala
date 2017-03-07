@@ -1,22 +1,12 @@
-package core.refactor
+package core.refactor.entity
 
-import core.refactor.EntityHelpers._
+import core.refactor.TestFixture
 import org.scalatest.{Matchers, WordSpec}
 
 /**
   * Created by rob on 26/02/17.
   */
-class EntitySpec extends WordSpec with Matchers {
-
-  val emptyEntity = Seq.empty[Component]
-  val testComponent = new TestComponent {}
-
-  class TestComponent extends Component
-
-  case class BooleanComponent(boolean: Boolean) extends Component
-
-  case class IntComponent(n: Int) extends Component
-
+class EntitySpec extends WordSpec with Matchers with TestFixture{
   "+" should {
     "add a component to the Entity" in {
       emptyEntity + testComponent should contain(testComponent)
@@ -35,7 +25,6 @@ class EntitySpec extends WordSpec with Matchers {
 
   "update[T](f)" should {
     "apply the function to the component if it exists within the entity" in {
-      val setToTrue = (c: BooleanComponent) => c.copy(boolean = true)
 
       val component = BooleanComponent(false)
       val entity = Entity(component)
@@ -52,8 +41,6 @@ class EntitySpec extends WordSpec with Matchers {
     }
 
     "chain commands together and operate them all" in {
-      val increment = (c: IntComponent) => c.copy(n = c.n + 1)
-
       val component = IntComponent(0)
       val entity = Entity(component)
 
@@ -64,8 +51,6 @@ class EntitySpec extends WordSpec with Matchers {
     }
 
     "work using the update command" in {
-      val increment = (c: IntComponent) => c.copy(n = c.n + 1)
-
       val component = IntComponent(0)
       val entity = Entity(component)
 
@@ -80,44 +65,27 @@ class EntitySpec extends WordSpec with Matchers {
 
   "exists" should {
     "return true when an entity contains a matching component" in {
-      val entity = Entity(IntComponent(0))
-
-      val predicate = (c: IntComponent) => c.n == 0
-
-      entity exists predicate shouldBe true
+      Entity(IntComponent(0)) exists intIsZero shouldBe true
     }
 
     "return false when an entity does not contain a matching component" in {
-      val entity = Entity(IntComponent(1))
-
-      val predicate = (c: IntComponent) => c.n == 0
-
-      entity exists predicate shouldBe false
+      Entity(IntComponent(1)) exists intIsZero shouldBe false
     }
 
     "return false when an entity does not contain the matching component type" in {
-      val predicate = (c: IntComponent) => c.n == 0
-
-      emptyEntity exists predicate shouldBe false
+      emptyEntity exists intIsZero shouldBe false
     }
 
     "work with the ?> operator" in {
-      val entity = Entity(IntComponent(0))
-
-      val predicate = (c: IntComponent) => c.n == 0
-
-      entity ?> predicate shouldBe true
+      Entity(IntComponent(0)) ?> intIsZero shouldBe true
     }
 
     "work with pattern matching" in {
       val validEntity = Entity(IntComponent(0))
-
-      val predicate = (c: IntComponent) => c.n == 0
-
       val collection = Set(validEntity, emptyEntity)
 
       val res = collection.collectFirst {
-        case e if e ?> predicate => e
+        case e if e ?> intIsZero => e
       }
 
       res should contain(validEntity)

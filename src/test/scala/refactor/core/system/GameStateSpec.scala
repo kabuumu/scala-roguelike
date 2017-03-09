@@ -1,9 +1,9 @@
-package core.refactor.system
+package refactor.core.system
 
-import core.refactor.TestFixture
-import core.refactor.entity.Entity
-import core.refactor.event.EventBuilder._
 import org.scalatest.{Matchers, WordSpec}
+import refactor.core.TestFixture
+import refactor.core.entity.Entity
+import refactor.core.event.EventBuilder._
 
 /**
   * Created by rob on 03/03/17.

@@ -1,6 +1,4 @@
-package core.refactor.entity
-
-import core.refactor.Component
+package refactor.core.entity
 
 
 /**

@@ -1,7 +1,7 @@
-package core.refactor.entity
+package refactor.core.entity
 
-import core.refactor.TestFixture
 import org.scalatest.{Matchers, WordSpec}
+import refactor.core.TestFixture
 
 /**
   * Created by rob on 26/02/17.

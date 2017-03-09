@@ -1,7 +1,7 @@
-package core.refactor.system
+package refactor.core.system
 
-import core.refactor.entity.Entity
-import core.refactor.event.{Event, UpdateEntity, UpdateEntity$}
+import refactor.core.entity.Entity
+import refactor.core.event.{Event, UpdateEntity}
 
 import scala.annotation.tailrec
 

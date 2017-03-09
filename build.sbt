@@ -9,7 +9,8 @@ libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "3.0.1",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
   "com.chuusai" %% "shapeless" % "2.3.2",
-  "org.typelevel" %% "cats" % "0.9.0"
+  "org.typelevel" %% "cats" % "0.9.0",
+  "com.github.julien-truffaut" %%  "monocle-core"  % "1.4.0"
 )
 
 resolvers ++= Seq(

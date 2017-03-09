@@ -1,6 +1,4 @@
-package core.refactor.entity
-
-import core.refactor.Component
+package refactor.core.entity
 
 import scala.reflect.ClassTag
 
@@ -20,6 +18,8 @@ case class Entity(components: Iterable[Component]) extends Iterable[Component] {
   })
 
   def get[T <: Component : ClassTag]: Option[T] = components.collectFirst { case c: T => c }
+
+  def get[T <: Component : ClassTag, V](f: T => V): Option[V] = get[T].map(f)
 
   def exists[T <: Component : ClassTag](pred: T => Boolean): Boolean =
     components.exists {

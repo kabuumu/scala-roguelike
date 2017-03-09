@@ -1,8 +1,8 @@
-package core.refactor.event
+package refactor.core.event
 
-import core.refactor.entity.Entity
-import core.refactor.event.UpdateEntity.{Input, Output}
-import core.refactor.system.GameState
+import refactor.core.entity.Entity
+import refactor.core.event.UpdateEntity._
+import refactor.core.system.GameState
 
 /**
   * Created by rob on 03/03/17.

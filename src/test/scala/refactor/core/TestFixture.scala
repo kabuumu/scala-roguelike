@@ -1,6 +1,6 @@
-package core.refactor
+package refactor.core
 
-import core.refactor.entity.Entity
+import refactor.core.entity.{Component, Entity}
 
 /**
   * Created by rob on 03/03/17.

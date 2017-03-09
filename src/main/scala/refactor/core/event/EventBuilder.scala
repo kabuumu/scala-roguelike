@@ -1,6 +1,6 @@
-package core.refactor.event
+package refactor.core.event
 
-import core.refactor.Component
+import refactor.core.entity.Component
 
 import scala.reflect.ClassTag
 

@@ -1,6 +1,6 @@
-package core.refactor.event
+package refactor.core.event
 
-import core.refactor.entity.Entity
+import refactor.core.entity.Entity
 
 /**
   * Created by rob on 07/03/17.

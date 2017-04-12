@@ -21,14 +21,25 @@ class PositionSpec extends WordSpec with Matchers with TestFixture {
     }
 
     "update x" in {
-      val expectedX = 1
-      val expectedY = testY
-      val expectedPosition = Position(expectedX, expectedY)
+      val expectedPosition = Position(testX + 1, testY)
+
       testEntity ~> move(Right) should contain(expectedPosition)
     }
 
     "return y as a value" in {
       testEntity get y should contain(testY)
+    }
+
+    "update y" in {
+      val expectedPosition = Position(testX, testY + 1)
+
+      testEntity ~> move(Down) should contain(expectedPosition)
+    }
+  }
+
+  "move" should {
+    "create a collision check event which will apply a provided event if it matches" in {
+
     }
   }
 }

@@ -15,7 +15,7 @@ case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
       .map(applyEvents(events))
       .unzip match {
       case (newEntities, newEvents) =>
-        val state = new GameState(newEntities)
+        val state = GameState(newEntities)
 
         newEvents.flatten match {
           case Nil => state

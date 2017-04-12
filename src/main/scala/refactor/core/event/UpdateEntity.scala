@@ -11,5 +11,5 @@ class UpdateEntity private[event](val predicate: Entity => Boolean, val f: Input
 
 object UpdateEntity {
   type Input = (GameState, Entity)
-  type Output = (Entity, Seq[UpdateEntity])
+  type Output = (Entity, Seq[Event])
 }

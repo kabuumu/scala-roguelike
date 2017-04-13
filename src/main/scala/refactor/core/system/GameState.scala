@@ -1,7 +1,7 @@
 package refactor.core.system
 
 import refactor.core.entity.Entity
-import refactor.core.event.{Event, UpdateEntity}
+import refactor.core.event.{Event, Update}
 
 import scala.annotation.tailrec
 
@@ -29,7 +29,7 @@ case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
   private def applyEvents(events: Iterable[Event]) = (entity: Entity) => {
     val startingState = (entity, Seq.empty[Event])
     events
-      .collect{case e:UpdateEntity if e.predicate(entity) => e}
+      .collect{case e:Update if e.predicate(entity) => e}
       .foldLeft(startingState) {
         case ((previousEntity, previousEvents), event) =>
           val (updatedEntity, newEvents) = event.f(this, previousEntity)

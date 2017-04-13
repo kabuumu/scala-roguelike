@@ -8,15 +8,15 @@ import scala.reflect.ClassTag
   * Created by rob on 07/03/17.
   */
 object EventBuilder {
-  val default: UpdateEntity.Input => UpdateEntity.Output = {
+  val default: Update.Input => Update.Output = {
     case (_, e) => (e, Nil)
   }
-  val event: UpdateEntity = new UpdateEntity(_ => true, default)
+  val event: Update = new Update(_ => true, default)
 
-  implicit class EventBuilder(event: UpdateEntity) {
+  implicit class EventBuilder(event: Update) {
     import event._
 
-    def update[T <: Component : ClassTag](componentUpdate: T => T): UpdateEntity = new UpdateEntity(
+    def update[T <: Component : ClassTag](componentUpdate: T => T): Update = new Update(
       predicate,
       f.andThen {
         case (entity, events) =>
@@ -24,21 +24,21 @@ object EventBuilder {
       }
     )
 
-    def when[T <: Component : ClassTag](newPredicate: T => Boolean): UpdateEntity = new UpdateEntity(
+    def when[T <: Component : ClassTag](newPredicate: T => Boolean): Update = new Update(
       entity => predicate(entity) && entity ?> newPredicate,
       f
     )
 
     def when[T <: Component : ClassTag] = new ComponentQuery[T]
 
-    def when(newPredicate: Entity => Boolean) = new UpdateEntity(
+    def when(newPredicate: Entity => Boolean) = new Update(
       entity => predicate(entity) && newPredicate(entity),
       f
     )
 
     def whenNot(newPredicate: Entity => Boolean) = when(!newPredicate(_))
 
-    def trigger(newEvents: Event*): UpdateEntity = new UpdateEntity(
+    def trigger(newEvents: Event*): Update = new Update(
       predicate,
       f.andThen {
         case (entity, events) =>
@@ -46,7 +46,7 @@ object EventBuilder {
       }
     )
 
-    def trigger(newEvent: Entity => Event): UpdateEntity = new UpdateEntity(
+    def trigger(newEvent: Entity => Event): Update = new Update(
       predicate,
       f.andThen {
         case (entity, events) =>
@@ -54,16 +54,16 @@ object EventBuilder {
       }
     )
 
-    def trigger(optEvent: Option[Entity => Event]): UpdateEntity = optEvent match{
+    def trigger(optEvent: Option[Entity => Event]): Update = optEvent match {
       case Some(e) => trigger(e)
       case _ => event
     }
 
     class ComponentQuery[T <: Component : ClassTag] {
-      def matches(e: Entity): UpdateEntity =
+      def matches(e: Entity): Update =
         when[T](e.get[T].contains[T](_)) when(e != _)
-      def eq(component: T): UpdateEntity = when[T]((_: T) == component)
-      def exists(predicate: T => Boolean): UpdateEntity = when[T](predicate)
+      def eq(component: T): Update = when[T]((_: T) == component)
+      def exists(predicate: T => Boolean): Update = when[T](predicate)
     }
   }
 

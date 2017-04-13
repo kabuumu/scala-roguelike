@@ -8,5 +8,5 @@ import refactor.core.entity.Entity
 trait Event
 
 object Event {
-  type TriggeredEvent = Entity => Event
+  type Triggered[event <: Event] = Entity => event
 }

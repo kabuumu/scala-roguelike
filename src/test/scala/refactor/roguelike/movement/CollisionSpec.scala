@@ -3,41 +3,33 @@ package refactor.roguelike.movement
 import org.scalatest.{Matchers, WordSpec}
 import refactor.core.TestFixture
 import refactor.core.entity.Entity
-import refactor.core.event.EventBuilder._
-import refactor.core.system.GameState
 
 /**
   * Created by rob on 03/04/17.
   */
 class CollisionSpec extends WordSpec with Matchers with TestFixture {
-  "collisionCheck" should {
+  "onCollision" should {
     val position = Position(0,0)
 
-    "trigger the provided collision event if it matches" in {
-      val entity = Entity(id, position, BooleanComponent(false))
+    "match the predicate on an entity with the same position that does not share an ID" in {
+      val entity = Entity(id, position)
       val wall = Entity(position)
 
-      val state = GameState(Seq(entity, wall))
-
-      val collisionEvent = event update setToTrue
-      val collisionCheck = Collision.onCollision(collisionEvent)(entity)
-
-      val expectedEntity = Entity(id, position, BooleanComponent(true))
-
-      state.update(Seq(collisionCheck)) should contain(expectedEntity)
+      Collision.onCollision(entity).predicate(wall) shouldBe true
     }
 
-    "not trigger the provided collision event if there is no collision" in {
-      val entity = Entity(id, position, BooleanComponent(false))
+    "not match when the position is different" in {
+      val entity = Entity(id, position)
+      val wall = Entity(Position(0, 1))
 
-      val state = GameState(Seq(entity))
+      Collision.onCollision(entity).predicate(wall) shouldBe false
+    }
 
-      val collisionEvent = event update setToTrue
-      val collisionCheck = Collision.onCollision(collisionEvent)(entity)
+    "not match on the same entityID" in {
+      val entity1 = Entity(id, position)
+      val entity2 = Entity(id, position)
 
-      val expectedEntity = Entity(id, position, BooleanComponent(false))
-
-      state.update(Seq(collisionCheck)) should contain(expectedEntity)
+      Collision.onCollision(entity1).predicate(entity2) shouldBe false
     }
   }
 }

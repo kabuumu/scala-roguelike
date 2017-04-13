@@ -15,7 +15,7 @@ class MovementSpec extends WordSpec with Matchers with TestFixture {
       val entity = Entity(id, Position(0, 0))
       val state = GameState(Seq(entity))
 
-      val event = Movement.moveEvent(id, Direction.Down)
+      val event = Movement.moveEvent(Direction.Down)(entity)
 
       val expectedEntity = Entity(id, Position(0, 1))
 

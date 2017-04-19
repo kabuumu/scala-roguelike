@@ -16,12 +16,11 @@ object EventBuilder {
   implicit class EventBuilder(event: Update) {
     import event._
 
-    def update[T <: Component : ClassTag](componentUpdate: T => T): Update = new Update(
+    def update[T <: Component : ClassTag](componentUpdate: T => T): Update = updateEntity(_ ~> componentUpdate)
+
+    def updateEntity(entityUpdate: Entity => Entity): Update = new Update(
       predicate,
-      f.andThen {
-        case (entity, events) =>
-          (entity ~> componentUpdate, events)
-      }
+      f.andThen { case (entity, events) => (entityUpdate(entity), events) }
     )
 
     def when[T <: Component : ClassTag](newPredicate: T => Boolean): Update = new Update(
@@ -72,5 +71,6 @@ object EventBuilder {
     case None => _ => false
     case Some(c) => matches[T](c)
   }
+
   def matches(entity: Entity): Entity => Boolean = matches(entity[ID])
 }

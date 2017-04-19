@@ -8,6 +8,8 @@ import scala.reflect.ClassTag
 case class Entity(components: Iterable[Component]) extends Iterable[Component] {
   def apply[T <: Component : ClassTag] = get[T]
 
+  def apply[T <: Component : ClassTag](op: T => T) = ~> (op)
+
   def +(component: Component) = Entity(components.++(Seq(component)))
 
   def ~>[T <: Component : ClassTag](f: T => T) = update[T](f)

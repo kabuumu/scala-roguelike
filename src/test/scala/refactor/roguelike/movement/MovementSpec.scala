@@ -3,7 +3,6 @@ package refactor.roguelike.movement
 import org.scalatest.{Matchers, WordSpec}
 import refactor.core.TestFixture
 import refactor.core.entity.Entity
-import refactor.core.event.EventBuilder._
 import refactor.core.system.GameState
 
 /**
@@ -11,15 +10,22 @@ import refactor.core.system.GameState
   */
 class MovementSpec extends WordSpec with Matchers with TestFixture {
   "Movement event" should {
-    "move an entity when the ID matches" in {
-      val entity = Entity(id, Position(0, 0))
-      val state = GameState(Seq(entity))
+    "match on ID" in {
+      val entity = Entity(id, Position(0,0))
 
-      val event = Movement.moveEvent(Direction.Down)(entity)
+      val f = Movement.moveEvent(Direction.Up)(entity)
 
-      val expectedEntity = Entity(id, Position(0, 1))
+      f.predicate(entity) shouldBe true
+    }
 
-      state.update(Seq(event)) should contain(expectedEntity)
+    "move an entity in the supplied direction" in {
+      val entity = Entity(id, Position(0,0))
+
+      val f = Movement.moveEvent(Direction.Up)(entity)
+
+      val expectedEntity = Entity(id, Position(0, -1))
+
+      f.f(GameState(Seq.empty), entity)._1 shouldBe expectedEntity
     }
   }
 }

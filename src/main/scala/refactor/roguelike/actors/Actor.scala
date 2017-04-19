@@ -1,5 +1,6 @@
 package refactor.roguelike.actors
 
+import refactor.core.entity.Entity
 import refactor.core.event.CoreEvents._
 import refactor.core.event.Event.Triggered
 import refactor.core.event.EventBuilder._
@@ -14,7 +15,8 @@ import refactor.roguelike.movement.Movement._
 trait Actor
 
 object Actor {
-  def actorMove(dir: Direction): Triggered[Update] = e => moveEvent(dir)(e) trigger actorCollision
+  def actorMove(dir: Direction): Triggered[Update] = e => moveEvent(dir)(e) trigger actorCollision(e)
 
-  def actorCollision: Triggered[Update] = e => onCollision(e) when isImpassable trigger resetEntity(e)
+  def actorCollision(originalEntity: Entity): Triggered[Update] = e =>
+    onCollision(e) when isImpassable trigger resetEntity(originalEntity)
 }

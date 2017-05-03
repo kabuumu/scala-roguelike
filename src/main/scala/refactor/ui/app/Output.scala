@@ -1,7 +1,7 @@
 package refactor.ui.app
 
 import refactor.core.system.GameState
-import refactor.roguelike.movement.Position
+import refactor.roguelike.movement.{Blocker, Position}
 
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color
@@ -35,7 +35,8 @@ class Output(state: GameState, canvas: Canvas) {
         for {
           (x, y) <- entity[Position].map(pos => (pos.x, pos.y))
         } {
-          g2d.setFill(Color.Green)
+          if (entity[Blocker].isDefined) g2d.setFill(Color.Grey)
+          else g2d.setFill(Color.Green)
           g2d.fillRect(x * size, y * size, size, size)
         }
     }

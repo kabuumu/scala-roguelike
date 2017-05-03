@@ -12,7 +12,11 @@ import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import refactor.core.entity.{Entity, ID}
-import refactor.roguelike.movement.{Blocker, Position}
+import refactor.roguelike.map.MapConverter
+import refactor.roguelike.map.MapConverter._
+import refactor.roguelike.movement.Direction.Up
+import refactor.roguelike.movement.Movement._
+import refactor.roguelike.movement._
 import rogueLike.actors.Player
 
 /**
@@ -26,13 +30,12 @@ object Main extends JFXApp {
   var keyCode: KeyCode = _
 
   val playerID = new ID
-  val startingPlayer = Entity(playerID, Position(0, 0))
-
+  val startingPlayer = Entity(playerID, Position(1, 1), Facing(Up))
+  val walls = convert(tileMap)
 
   var state: GameState = GameState(Seq(
-    startingPlayer,
-    Entity(new ID, Position(2, 2), Blocker)
-  ))
+    startingPlayer
+  ) ++ walls)
 
   stage = new PrimaryStage {
     title = "scala-roguelike"
@@ -52,7 +55,7 @@ object Main extends JFXApp {
         inputEvent <- Input(keyCode)
       } yield inputEvent(player)
 
-      state = state.update(inputEvent)
+      state = state.update(Seq(velocityUpdate) ++ inputEvent)
 
       new Output(state, canvas).update()
       keyCode = null

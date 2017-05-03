@@ -45,7 +45,7 @@ object EventBuilder {
       }
     )
 
-    def trigger(newEvent: Entity => Event): Update = new Update(
+    def trigger(newEvent: => Entity => Event): Update = new Update(
       predicate,
       f.andThen {
         case (entity, events) =>
@@ -53,10 +53,9 @@ object EventBuilder {
       }
     )
 
-    def trigger(optEvent: Option[Entity => Event]): Update = optEvent match {
-      case Some(e) => trigger(e)
-      case _ => event
-    }
+    def trigger(condEvent: => Entity => Option[Event])(implicit dummyImplicit: DummyImplicit): Update = trigger(
+      condEvent andThen(_.getOrElse(event))
+    )
 
     class ComponentQuery[T <: Component : ClassTag] {
       def matches(e: Entity): Update =
@@ -73,4 +72,6 @@ object EventBuilder {
   }
 
   def matches(entity: Entity): Entity => Boolean = matches(entity[ID])
+
+  def contains[T <: Component : ClassTag]: Entity => Boolean = _[T].isDefined
 }

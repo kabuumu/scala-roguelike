@@ -8,12 +8,7 @@ import refactor.core.event.Event.Triggered
 object CoreEvents {
   import refactor.core.event.EventBuilder._
 
-  def resetEntity: Triggered[Update] = e => onIDMatch(e) updateEntity{
-    entity =>
-      println(entity)
-      println(e)
-      e
-  }
+  def resetEntity: Triggered[Update] = e => onIDMatch(e) updateEntity(_ => e)
 
   def onIDMatch: Triggered[Update] = event when matches(_)
 }

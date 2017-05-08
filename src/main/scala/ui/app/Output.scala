@@ -1,40 +1,44 @@
 package ui.app
 
-import core.GameState
-import rogueLike.movement.Position
-import rogueLike.output.Sprite
+import core.system.GameState
+import roguelike.movement.{Blocker, Position}
 
 import scalafx.scene.canvas.Canvas
+import scalafx.scene.paint.Color
 
 /**
   * Created by rob on 13/04/16.
   */
-object Output {
-  def update(state: GameState, canvas: Canvas): Unit = {
-    val g2d = canvas.getGraphicsContext2D
-    val size = 32
+class Output(state: GameState, canvas: Canvas) {
+  val g2d = canvas.getGraphicsContext2D
+  val size = 32
 
-    val (height, width) = (canvas.getHeight, canvas.getWidth)
+  val gameArea = new {
+    val width = ((canvas.getWidth * 0.75) / size).toInt * size
+    val height = canvas.getHeight.toInt
+  }
 
-    val tiles = height / size
+  val xOffset = (gameArea.width / size) / 2 - 1
+  val yOffset = (gameArea.height / size) / 2 - 1
 
-    val offset = tiles / 2 - 1
+  def update(): Unit = {
+    g2d.clearRect(0, 0, canvas.getWidth, canvas.getHeight)
+    g2d.setFill(Color.Black)
+    g2d.fillRect(0, 0, canvas.getWidth, canvas.getHeight)
 
-    g2d.clearRect(0, 0, height, width)
+    drawEntities()
+  }
 
-    val (playerX, playerY) = state
-      .entities
-      .collectFirst { case e: Position if e.id == Main.playerID => e }
-      .map(pos => (pos.x, pos.y))
-      .get
-
-    state.entities.collect {
-      case sprite: Sprite =>
-        g2d.setFill(sprite.col)
-        state.entities
-          .collectFirst { case pos: Position if pos.id == sprite.id => pos }
-          .foreach{pos =>
-            g2d.fillRect((pos.x + offset - playerX) * size, (pos.y + offset - playerY) * size, size, size)}
+  def drawEntities() = {
+    state.entities.foreach {
+      entity =>
+        for {
+          (x, y) <- entity[Position].map(pos => (pos.x, pos.y))
+        } {
+          if (entity[Blocker].isDefined) g2d.setFill(Color.Grey)
+          else g2d.setFill(Color.Green)
+          g2d.fillRect(x * size, y * size, size, size)
+        }
     }
   }
 }

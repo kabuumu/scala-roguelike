@@ -1,14 +1,14 @@
 package ui.input
 
-import javafx.scene.paint.Color
-
-import core.Entity._
-import core.{Entity, Event}
-import rogueLike.async.Initiative
-import rogueLike.combat.{Combat, Projectile}
-import rogueLike.movement.{Direction, Movement, Position}
-import rogueLike.output.Sprite
-import ui.app.Main
+import core.entity.Entity
+import core.event.CoreEvents._
+import core.event.Event
+import core.event.Event.Triggered
+import core.event.EventBuilder._
+import roguelike.actors.Actor
+import roguelike.combat.Projectile._
+import roguelike.movement.Direction
+import roguelike.movement.Direction.Direction
 
 import scalafx.scene.input.KeyCode
 
@@ -18,19 +18,18 @@ import scalafx.scene.input.KeyCode
 trait Input
 
 object Input {
-  def apply(key: KeyCode) = {
-    val dir = Option(key match {
-      case KeyCode.UP => Direction.Up
-      case KeyCode.DOWN => Direction.Down
-      case KeyCode.LEFT => Direction.Left
-      case KeyCode.RIGHT => Direction.Right
-      case _ => null
-    })
+  val inputMap = Map(
+    KeyCode.Up -> Direction.Up,
+    KeyCode.Down -> Direction.Down,
+    KeyCode.Left -> Direction.Left,
+    KeyCode.Right -> Direction.Right,
+    KeyCode.A -> Attack
+  )
 
-    if(key == KeyCode.A) Some(Combat.projectileEvent("pc", createEntity(Projectile(_), Initiative(2, _), Position(0,0,Direction.Up, isBlocker = true, _), Sprite(Color.RED, _))))
-    else dir.map(dir =>
-      Event{case e:Initiative if e.id == Main.playerID && e.current == 0 => (Iterable(e.reset), Some(Movement.moveEvent(Main.playerID, dir)))})
+  def apply(key: KeyCode): Option[Triggered[Event]] = {
+    inputMap.get(key).collect[Entity => Event] {
+      case dir: Direction => Actor.actorMove(dir)
+      case Attack => e:Entity => onIDMatch(e) trigger createProjectile
+    }
   }
 }
-
-case object NONE extends Input

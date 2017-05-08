@@ -12,12 +12,14 @@ import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.input.{KeyCode, KeyEvent}
 import refactor.core.entity.{Entity, ID}
+import refactor.roguelike.actors.EnemyMarker
+import refactor.roguelike.ai.Enemy
+import refactor.roguelike.async.{Async, Initiative}
 import refactor.roguelike.map.MapConverter
 import refactor.roguelike.map.MapConverter._
-import refactor.roguelike.movement.Direction.Up
+import refactor.roguelike.movement.Direction._
 import refactor.roguelike.movement.Movement._
 import refactor.roguelike.movement._
-import rogueLike.actors.Player
 
 /**
   * Created by rob on 13/04/16.
@@ -30,11 +32,15 @@ object Main extends JFXApp {
   var keyCode: KeyCode = _
 
   val playerID = new ID
+  val enemyID = new ID
+
   val startingPlayer = Entity(playerID, Position(1, 1), Facing(Up))
+  val startingEnemy = Entity(new ID, EnemyMarker, Position(20, 5), Facing(Left), Initiative(max = 25))
   val walls = convert(tileMap)
 
   var state: GameState = GameState(Seq(
-    startingPlayer
+    startingPlayer,
+    startingEnemy
   ) ++ walls)
 
   stage = new PrimaryStage {
@@ -55,7 +61,15 @@ object Main extends JFXApp {
         inputEvent <- Input(keyCode)
       } yield inputEvent(player)
 
-      state = state.update(Seq(velocityUpdate) ++ inputEvent)
+      val enemyMoveEvent = for {
+        player <- state.entities.find(_[ID] contains playerID)
+      } yield Enemy.enemyMoveEvent(player)
+
+      state = state.update(
+        Seq(velocityUpdate,
+          Async.updateInitiative
+        ) ++ inputEvent ++ enemyMoveEvent
+      )
 
       new Output(state, canvas).update()
       keyCode = null

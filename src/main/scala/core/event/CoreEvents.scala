@@ -8,7 +8,7 @@ import core.event.Event.Triggered
 object CoreEvents {
   import core.event.EventBuilder._
 
-  def resetEntity: Triggered[Update] = e => onIDMatch(e) updateEntity(_ => e)
+  def resetEntity: Triggered[Update] = e => onIDMatch(e) update(_ => e)
 
   def onIDMatch: Triggered[Update] = event when matches(_)
 }

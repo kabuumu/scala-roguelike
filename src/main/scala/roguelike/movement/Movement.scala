@@ -15,7 +15,7 @@ import roguelike.movement.Facing._
   * Created by rob on 20/03/17.
   */
 object Movement {
-  def moveEvent(dir: Direction): Triggered[Update] = e => onIDMatch(e) updateEntity moveUpdate(dir)
+  def moveEvent(dir: Direction): Triggered[Update] = e => onIDMatch(e) update moveUpdate(dir)
 
   def moveUpdate(dir:Direction): Entity => Entity = {
     case e if e.exists[Facing](_.dir == dir) => e apply move(dir)
@@ -24,7 +24,7 @@ object Movement {
 
   val isImpassable: Entity => Boolean = _[Blocker].isDefined
 
-  val velocityUpdate: Update = event when contains[Velocity] trigger moveByVelocity
+  val velocityUpdate: Update = event trigger moveByVelocity
 
   def moveByVelocity: Entity => Option[Update] = e => for {
     Velocity(_, direction, timer) <- e[Velocity]

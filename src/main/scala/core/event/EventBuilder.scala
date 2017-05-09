@@ -8,32 +8,23 @@ import scala.reflect.ClassTag
   * Created by rob on 07/03/17.
   */
 object EventBuilder {
-  val default: Update.Input => Update.Output = {
+  val defaultFunction: Update.Input => Update.Output = {
     case (_, e) => (e, Nil)
   }
-  val event: Update = new Update(_ => true, default)
+  val event: Update = new Update(_ => true, defaultFunction)
 
   implicit class EventBuilder(event: Update) {
     import event._
 
-    def update[T <: Component : ClassTag](componentUpdate: T => T): Update = updateEntity(_ ~> componentUpdate)
-
-    def updateEntity(entityUpdate: Entity => Entity): Update = new Update(
+    def update(entityUpdate: Entity => Entity): Update = new Update(
       predicate,
       f.andThen { case (entity, events) => (entityUpdate(entity), events) }
-    )
-
-    def when[T <: Component : ClassTag](newPredicate: T => Boolean): Update = new Update(
-      entity => predicate(entity) && entity ?> newPredicate,
-      f
     )
 
     def when(newPredicate: Entity => Boolean) = new Update(
       entity => predicate(entity) && newPredicate(entity),
       f
     )
-
-    def whenNot(newPredicate: Entity => Boolean) = when(!newPredicate(_))
 
     def trigger(newEvents: Event*): Update = new Update(
       predicate,
@@ -43,7 +34,7 @@ object EventBuilder {
       }
     )
 
-    def trigger(newEvent: => Entity => Event): Update = new Update(
+    def trigger(newEvent: Entity => Event): Update = new Update(
       predicate,
       f.andThen {
         case (entity, events) =>
@@ -51,7 +42,7 @@ object EventBuilder {
       }
     )
 
-    def trigger(condEvent: => Entity => Option[Event])(implicit dummyImplicit: DummyImplicit): Update = trigger(
+    def trigger(condEvent: Entity => Option[Event])(implicit dummyImplicit: DummyImplicit): Update = trigger(
       condEvent andThen(_.getOrElse(event))
     )
   }
@@ -64,5 +55,9 @@ object EventBuilder {
 
   def matches(entity: Entity): Entity => Boolean = matches(entity[ID])
 
-  def contains[T <: Component : ClassTag]: Entity => Boolean = _[T].isDefined
+  def not[T](predicate: T => Boolean): T => Boolean = predicate.andThen(!_)
+
+  implicit def liftUpdate[T <: Component : ClassTag](update: T => T): Entity => Entity = _ apply update
+
+  implicit def liftQuery[T <: Component : ClassTag](predicate: T => Boolean): Entity => Boolean = _ exists predicate
 }

@@ -11,5 +11,5 @@ import core.event.Update
   */
 object Collision {
   val onCollision: Triggered[Update] = (entity) =>
-    event when matches(entity[Position]) whenNot matches(entity[ID])
+    event when matches(entity[Position]) when not(matches(entity[ID]))
 }

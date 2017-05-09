@@ -14,6 +14,7 @@ object EventBuilder {
   val event: Update = new Update(_ => true, defaultFunction)
 
   implicit class EventBuilder(event: Update) {
+
     import event._
 
     def update(entityUpdate: Entity => Entity): Update = new Update(
@@ -42,8 +43,12 @@ object EventBuilder {
       }
     )
 
-    def trigger(condEvent: Entity => Option[Event])(implicit dummyImplicit: DummyImplicit): Update = trigger(
-      condEvent andThen(_.getOrElse(event))
+    def trigger(newEvents: Entity => Iterable[Event])(implicit dummyImplicit: DummyImplicit): Update = new Update(
+      predicate,
+      f.andThen {
+        case (entity, events) =>
+          (entity, events ++ newEvents(entity))
+      }
     )
   }
 

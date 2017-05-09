@@ -1,11 +1,10 @@
 package roguelike.combat
 
 import core.entity.{Entity, ID}
-import core.event.CoreEvents._
 import core.event.Event._
 import core.event._
 import roguelike.actors.Affinity
-import roguelike.combat.Health.{decreaseHealth, decreaseHealthEvent}
+import roguelike.combat.Health.decreaseHealthEvent
 import roguelike.movement.Collision._
 import roguelike.movement.{Facing, Position, Velocity}
 
@@ -33,7 +32,7 @@ object Projectile {
     )
   )
 
-  def damageCheck(origin: Entity): Entity => Option[Event] = target => for {
+  def damageCheck(origin: Entity): Entity => Iterable[Event] = target => for {
       originAffinity <- origin[Affinity]
       targetAffinity <- target[Affinity]
       if originAffinity != targetAffinity

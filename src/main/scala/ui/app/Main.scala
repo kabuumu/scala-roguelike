@@ -1,10 +1,12 @@
 package ui.app
 
 import core.entity.{Entity, ID}
+import core.event.Event
 import core.system.GameState
+import roguelike.actors.Affinity
 import roguelike.actors.Affinity.{Enemy, Player}
-import roguelike.actors.{Affinity, Affinity$}
 import roguelike.ai.EnemyAI
+import roguelike.async.Initiative._
 import roguelike.async.{Async, Initiative}
 import roguelike.combat.Health
 import roguelike.map.MapConverter._
@@ -35,7 +37,7 @@ object Main extends JFXApp {
   val playerID = new ID
   val enemyID = new ID
 
-  val startingPlayer = Entity(playerID, Affinity(Player), Position(1, 1), Facing(Up))
+  val startingPlayer = Entity(playerID, Affinity(Player), Position(1, 1), Facing(Up), Initiative(max = 20))
   val startingEnemy = Entity(new ID, Affinity(Enemy), Position(20, 5), Facing(Left), Initiative(max = 25), Health(max = 30))
   val walls = convert(tileMap)
 
@@ -57,20 +59,22 @@ object Main extends JFXApp {
 
   AnimationTimer { now: Long =>
     if(lastDelta < now - 1000000000/150) {
-      val inputEvent = for {
+      val events:Option[Seq[Event]] = for {
         player <- state.entities.find(_[ID] contains playerID)
-        inputEvent <- Input(keyCode)
-      } yield inputEvent(player)
+      } yield {
+        val inputEvent = Input(keyCode)
 
-      val enemyMoveEvent = for {
-        player <- state.entities.find(_[ID] contains playerID)
-      } yield EnemyAI.enemyMoveEvent(player)
+        if ((player exists notReady) || inputEvent.isDefined) {
+          Seq(
+            velocityUpdate,
+            Async.updateInitiative,
+            EnemyAI.enemyMoveEvent(player)
+          ) ++ (inputEvent map (_.apply(player)))
+        }
+        else Nil
+      }
 
-      state = state.update(
-        Seq(velocityUpdate,
-          Async.updateInitiative
-        ) ++ inputEvent ++ enemyMoveEvent
-      )
+      state = state.update(events.getOrElse(Nil))
 
       new Output(state, canvas).update()
       keyCode = null

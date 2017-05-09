@@ -6,6 +6,9 @@ import core.event.Event
 import core.event.Event.Triggered
 import core.event.EventBuilder._
 import roguelike.actors.Actor
+import roguelike.actors.Actor._
+import roguelike.async.Initiative
+import roguelike.async.Initiative._
 import roguelike.combat.Projectile._
 import roguelike.movement.Direction
 import roguelike.movement.Direction.Direction
@@ -28,8 +31,8 @@ object Input {
 
   def apply(key: KeyCode): Option[Triggered[Event]] = {
     inputMap.get(key).collect[Entity => Event] {
-      case dir: Direction => Actor.actorMove(dir)
-      case Attack => e:Entity => onIDMatch(e) trigger createProjectile
+      case dir: Direction => e: Entity => actorMove(dir)(e) when isReady update reset
+      case Attack => e:Entity => onIDMatch(e) when isReady update reset trigger createProjectile
     }
   }
 }

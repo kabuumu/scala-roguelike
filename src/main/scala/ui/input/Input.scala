@@ -1,17 +1,12 @@
 package ui.input
 
-import core.entity.Entity
-import core.event.CoreEvents._
+import cats.implicits._
 import core.event.Event
 import core.event.Event.Triggered
 import core.event.EventBuilder._
-import roguelike.actors.Actor
 import roguelike.actors.Actor._
-import roguelike.async.Initiative
-import roguelike.async.Initiative._
-import roguelike.combat.Attack
+import roguelike.async.Initiative.isReady
 import roguelike.combat.Attack._
-import roguelike.combat.Projectile._
 import roguelike.movement.Direction
 import roguelike.movement.Direction.Direction
 
@@ -31,10 +26,10 @@ object Input {
     KeyCode.A -> AttackInput
   )
 
-  def apply(key: KeyCode): Option[Triggered[Event]] = {
-    inputMap.get(key).collect[Entity => Event] {
-      case dir: Direction => e: Entity => actorMove(dir)(e) when isReady
-      case AttackInput => e:Entity => onIDMatch(e) update reset trigger swordAttack when isReady
-    }
-  }
+  def apply(key: KeyCode): Option[Triggered[Event]] = for {
+      event <- inputMap.get(key).collect {
+        case dir: Direction => actorMove(dir)
+        case AttackInput => attackEvent
+      }
+    } yield event.map(_ when isReady)
 }

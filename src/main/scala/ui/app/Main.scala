@@ -39,7 +39,7 @@ object Main extends JFXApp {
   val playerID = new ID
   val enemyID = new ID
 
-  val startingPlayer = Entity(playerID, Affinity(Player), Position(1, 1), Facing(Up), Initiative(max = 10), Speed(5))
+  val startingPlayer = Entity(playerID, Affinity(Player), Position(1, 1), Facing(Up), Initiative(max = 10), Health(max = 30), Speed(5))
   val startingEnemy = Entity(new ID, Affinity(Enemy), Position(20, 5), Facing(Left), Initiative(max = 15), Health(max = 30), Speed(4))
   val walls = convert(tileMap)
 

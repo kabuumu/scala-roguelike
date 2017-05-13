@@ -1,6 +1,8 @@
 package ui.app
 
 import core.system.GameState
+import roguelike.actors.Affinity
+import roguelike.combat.Attack
 import roguelike.movement.{Blocker, Position}
 
 import scalafx.scene.canvas.Canvas
@@ -35,8 +37,15 @@ class Output(state: GameState, canvas: Canvas) {
         for {
           (x, y) <- entity[Position].map(pos => (pos.x, pos.y))
         } {
-          if (entity[Blocker].isDefined) g2d.setFill(Color.Grey)
-          else g2d.setFill(Color.Green)
+          val colour = if (entity[Blocker].isDefined) Color.Grey
+          else if(entity[Attack].isDefined) Color.LightGrey
+          else if(entity[Affinity].exists(_.faction == Affinity.Player)) Color.Green
+          else if(entity[Affinity].exists(_.faction == Affinity.Enemy)) Color.DarkRed
+          else Color.White
+
+          println(entity)
+
+          g2d.setFill(colour)
           g2d.fillRect(x * size, y * size, size, size)
         }
     }

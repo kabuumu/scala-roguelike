@@ -43,8 +43,6 @@ class Output(state: GameState, canvas: Canvas) {
           else if(entity[Affinity].exists(_.faction == Affinity.Enemy)) Color.DarkRed
           else Color.White
 
-          println(entity)
-
           g2d.setFill(colour)
           g2d.fillRect(x * size, y * size, size, size)
         }

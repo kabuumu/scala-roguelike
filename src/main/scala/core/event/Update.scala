@@ -7,7 +7,7 @@ import core.system.GameState
 /**
   * Created by rob on 03/03/17.
   */
-class Update private[event](val predicate: Entity => Boolean, val f: Input => Output) extends Event
+class Update (val predicate: Entity => Boolean, val f: Input => Output) extends Event
 
 object Update {
   type Input = (GameState, Entity)

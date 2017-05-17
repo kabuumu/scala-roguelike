@@ -1,4 +1,4 @@
-package roguelike.map
+package data.map
 
 import core.entity.{Entity, ID}
 import roguelike.movement.{Blocker, Position}

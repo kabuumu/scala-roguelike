@@ -22,7 +22,9 @@ object EnemyAI {
     Facing(enemyFacing) <- enemy[Facing]
     distance = enemyPos.distance(playerPos)
     direction = Direction(enemyPos.x, enemyPos.y, playerPos.x, playerPos.y)
-    if distance < 10
-  } yield if ((distance > 1) || !(enemyFacing == direction)) PathfindingEvent(player)(enemy)
+    if distance < 20
+  } yield {
+    if ((distance > 1) || !(enemyFacing == direction)) PathfindingEvent(player)(enemy)
     else attackEvent(enemy)
+  }
 }

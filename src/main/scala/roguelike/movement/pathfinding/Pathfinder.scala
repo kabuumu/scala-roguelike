@@ -9,34 +9,42 @@ import scala.annotation.tailrec
   */
 
 class Pathfinder(origin: (Int, Int), target: (Int, Int), blockers: Set[(Int, Int)]) {
+  var loopCount = 0
+
   val path: Seq[(Int, Int)] = loop(getOptions(origin).sortBy(getDistance(target, _)) map (Seq(_)))
   val getNext: (Int, Int) = path.head
 
   @tailrec
   private def loop(openPaths: Seq[Seq[(Int, Int)]],
-                   closedTiles: Set[(Int, Int)] = Set.empty,
+                   closedTiles: Map[(Int, Int), Int] = Map(origin -> 0),
                    successPaths: Seq[Seq[(Int, Int)]] = Nil,
                    pathLimit: Int = PATH_LIMIT
                   ): Seq[(Int, Int)] = {
+    loopCount += 1
+
     val newSuccessPaths = successPaths ++ openPaths.filter(_.contains(target)) sortBy(_.size)
     val newPathLimit = newSuccessPaths.headOption.fold(pathLimit)(_.size)
 
     openPaths filter(_.size < newPathLimit) match {
       case head :: tail =>
         val nextSteps: Seq[Seq[(Int, Int)]] = getOptions(head.last).sortBy(getDistance(target, _))
-          .filterNot(closedTiles.contains)
+          .filterNot(tile => closedTiles.get(tile).exists(_ <= head.size + 1))
           .map(head :+ _)
 
-        val newPaths = nextSteps ++ openPaths.tail
+        val newPaths = nextSteps ++ openPaths.tail sortBy(_.size)
+
+        val newClosedTiles = closedTiles ++ openPaths
+          .map(path => (path.last, path.size))
+          .filterNot { case (tile, cost) => closedTiles.get(tile).exists(_ > cost) }
 
         loop(
           openPaths = newPaths.diff(newSuccessPaths),
-          closedTiles = closedTiles ++ newPaths.flatten.toSet,
+          closedTiles = newClosedTiles,
           successPaths = newSuccessPaths,
           pathLimit = newPathLimit
         )
       case Nil =>
-        newSuccessPaths.head
+        newSuccessPaths.headOption.getOrElse(Seq(origin))
     }
   }
 
@@ -59,6 +67,6 @@ class Pathfinder(origin: (Int, Int), target: (Int, Int), blockers: Set[(Int, Int
 }
 
 object Pathfinder {
-  val PATH_LIMIT = 23
+  val PATH_LIMIT = 123
 }
 

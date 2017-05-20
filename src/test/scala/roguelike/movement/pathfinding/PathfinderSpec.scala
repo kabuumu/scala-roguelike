@@ -69,6 +69,39 @@ class PathfinderSpec extends WordSpec with Matchers {
 
       val pathfinder = new Pathfinder(startPoint, target, blockers)
       pathfinder.path.length shouldBe 19
+      pathfinder.loopCount should be < 200
+    }
+
+    "get the shortest path when it is not the nearest" in {
+      val blockers = convert(
+        "XXXXXXXXXXXXXXXXXXXXXXXXX",
+        "XOOOOOOOXXXXXXXXXXXXXXXXX",
+        "XOOOOOOOXXXOOOXXOOOOOOOXX",
+        "XOOOOOOOOOOOOOOOOOOOOOOXX",
+        "XOOOOOOOXXXOOOXXOOOOOOOXX",
+        "XOOOOOOOXXXXOXXXOOOOOOOXX",
+        "XXXXXXXXXXXXOXXXOOOOOOOXX",
+        "XXXXXXXXXXXXOXXXXXXOOXXXX",
+        "XOOOOOOOOOOOOOOOOOOOOOOOX",
+        "XOOOOOOOOOOOOOOOOOOOOOOOX",
+        "XOOOOOOOOOOOOOOOOOOOOOOOX",
+        "XXXXXXXXXXXXOXXXXXXXXXXXX",
+        "XOOOOOOOOOOOOXOOOOOOOOOOX",
+        "XOXXXXXXXXXXOXOOOOOOOOOOX",
+        "XOXOOOOOOOOXOOOOOOOOOOOOX",
+        "XOXOXXXXXXOXOOOOOOOOOOOOX",
+        "XOXOOOOOOXOXOOOOOOOOOOOOX",
+        "XOXXXXXXXXOXOOOOOOOOOOOOX",
+        "XOOOOOOOOOOXOOOOOOOOOOOOX",
+        "XXXXXXXXXXXXXXXXXXXXXXXXX"
+      )
+
+      val startPoint = 10 -> 8
+      val target = 2 -> 1
+
+      val pathfinder = new Pathfinder(startPoint, target, blockers)
+      pathfinder.path.length shouldBe 19
+      pathfinder.loopCount should be <= 300
     }
   }
 }

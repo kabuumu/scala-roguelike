@@ -30,8 +30,8 @@ case class VisibleTiles(tiles: Set[Position]) extends EventComponent {
               targetX <- xRange(direction, x)
               targetY <- yRange(direction, y)
               if (direction match {
-                case Left | Right => Math.abs(targetY - y) < Math.abs(targetX - x) + gradMod
-                case Up | Down => Math.abs(targetX - x) < Math.abs(targetY - y) + gradMod
+                case Left | Right => Math.abs(targetY - y) / gradDiv < Math.abs(targetX - x) + gradMod
+                case Up | Down => Math.abs(targetX - x) / gradDiv < Math.abs(targetY - y) + gradMod
               })
               if isVisible(x, y, targetX, targetY, blockers)
             } yield Position(targetX, targetY)
@@ -45,7 +45,8 @@ case class VisibleTiles(tiles: Set[Position]) extends EventComponent {
 }
 
 object VisibleTiles {
-  val gradMod = 2
+  val gradMod = 1
+  val gradDiv = 2
 
   def set(tiles: Iterable[Position]): VisibleTiles => VisibleTiles = _ => VisibleTiles(tiles.toSet)
 

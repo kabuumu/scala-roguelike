@@ -55,7 +55,7 @@ object GameData {
     new ID,
     pos,
     Spawner(enemy),
-    Initiative(max = 10000)
+    Initiative(max = 100)
   )
 
   val walls = convert(tileMap)

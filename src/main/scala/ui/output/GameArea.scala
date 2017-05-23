@@ -5,8 +5,8 @@ import core.system.GameState
 import roguelike.actors.Affinity
 import roguelike.combat.Attack
 import roguelike.movement.lineofsight.{RememberedTiles, VisibleTiles}
-import roguelike.movement.{Blocker, Floor, Position}
-import roguelike.scenery.{Floor, Wall}
+import roguelike.movement.{Blocker, Position}
+import roguelike.scenery.{Floor, Scenery, Wall}
 import ui.output.OutputConfig._
 
 import scalafx.scene.canvas.Canvas
@@ -41,6 +41,7 @@ class GameArea(canvas: Canvas) {
         } {
           val isVisible = visibleTiles.contains(Position(x, y))
           val isRemembered = rememberedTiles.contains(Position(x, y))
+          val isSceneryEntity = entity[Scenery].isDefined
 
           val xOffset = (xTiles / 2) - (playerX - x)
           val yOffset = (yTiles / 2) - (playerY - y)
@@ -60,11 +61,8 @@ class GameArea(canvas: Canvas) {
 
             def drawTile() = g2d.fillRect(displayX, displayY, size, size)
 
-            if (isVisible) {
-              if(entity[Attack].isDefined) println(entity)
-              drawTile()
-            }
-            else if (isRemembered) {
+            if (isVisible) drawTile()
+            else if (isRemembered && isSceneryEntity) {
               g2d.setFill(colour.desaturate.desaturate.darker)
               drawTile()
             }

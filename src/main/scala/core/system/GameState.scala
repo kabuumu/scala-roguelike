@@ -11,14 +11,15 @@ case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
     applyUpdates(events).withCreations(events).withDeletions(events)
 
   private final def applyUpdates(events: Iterable[Event]): GameState = entities
+      .par
       .map(applyEvents(events))
       .unzip match {
       case (newEntities, newEvents) =>
-        val state = GameState(newEntities)
+        val state = GameState(newEntities.seq)
 
         newEvents.flatten match {
-          case Nil => state
-          case flattenedEvents => state.update(flattenedEvents)
+          case es if es.isEmpty => state
+          case flattenedEvents => state.update(flattenedEvents.seq)
         }
     }
 

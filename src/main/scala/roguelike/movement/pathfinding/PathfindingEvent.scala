@@ -20,7 +20,7 @@ object PathfindingEvent {
           Position(targetX, targetY) <- target[Position]
         } yield {
           val blockers =
-            (state.entities filter(_[Blocker].isDefined) flatMap(_[Position]) map(pos => (pos.x, pos.y))).toSet
+            (state.entities.seq filter(_[Blocker].isDefined) flatMap(_[Position]) map(pos => (pos.x, pos.y))).toSet
           val pathfinder = new Pathfinder(x -> y, targetX -> targetY, blockers)
 
           val (newX, newY) = pathfinder.getNext

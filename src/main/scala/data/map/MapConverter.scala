@@ -1,7 +1,8 @@
 package data.map
 
-import core.entity.{Entity, ID}
-import roguelike.movement.{Blocker, Position}
+import core.entity.Entity
+import data.GameData._
+import roguelike.movement.Position
 
 /**
   * Created by rob on 21/04/17.
@@ -11,7 +12,8 @@ object MapConverter {
     tileMap.zipWithIndex.flatMap {
       case (row, y) =>
         row.zipWithIndex.collect {
-          case ('X', x) => Entity(new ID, Position(x, y), Blocker)
+          case ('X', x) => wall(Position(x,y))
+          case ('O', x) => floor(Position(x,y))
         }
     }
 

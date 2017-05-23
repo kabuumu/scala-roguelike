@@ -7,6 +7,7 @@ import roguelike.actors.Affinity
 import roguelike.combat.Health.decreaseHealthEvent
 import roguelike.movement.Collision._
 import roguelike.movement.{Facing, Position, Velocity}
+import roguelike.scenery.Scenery._
 
 /**
   * Created by rob on 28/04/17.
@@ -15,7 +16,7 @@ object Projectile {
   import core.event.EventBuilder._
 
   def projectileCollision: Triggered[Update] = e =>
-    onCollision(e) trigger DeleteEntity(e) trigger damageCheck(e)
+    onCollision(e) when not(isScenery) trigger DeleteEntity(e) trigger damageCheck(e)
 
   def createProjectile: Triggered[Option[Event]] = creator => for {
     facing <- creator[Facing]

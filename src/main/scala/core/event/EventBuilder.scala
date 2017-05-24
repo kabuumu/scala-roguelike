@@ -1,5 +1,6 @@
 package core.event
 
+import cats._
 import core.entity.{Component, Entity, ID}
 
 import scala.reflect.ClassTag
@@ -13,9 +14,30 @@ object EventBuilder {
   }
   val event: Update = new Update(_ => true, defaultFunction)
 
+  def matches(entity: Entity): Entity => Boolean = matches(entity[ID])
+
+  def matches[T <: Component : ClassTag](optComponent: Option[T]): Entity => Boolean = optComponent match {
+    case None => _ => false
+    case Some(c) => matches[T](c)
+  }
+
+  def matches[T <: Component : ClassTag](component: T): Entity => Boolean = _.exists[T](_ == component)
+
+  def not[T](predicate: T => Boolean): T => Boolean = predicate.andThen(!_)
+
+  implicit def convertUpdate[T <: Component : ClassTag](update: T => T): Entity => Entity = _ apply update
+
+  implicit def lift[T <: Component : ClassTag, F[_]](update: F[T => T])(implicit functor: Functor[F], f: (T => T) => Entity => Entity): F[Entity => Entity] =
+    functor.map(update)(f)
+
+  implicit def convertQuery[T <: Component : ClassTag](predicate: T => Boolean): Entity => Boolean = _ exists predicate
+
   implicit class EventBuilder(event: Update) {
 
     import event._
+
+    def update(updates: Iterable[Entity => Entity]): Update =
+      updates.foldLeft(event)(_.update(_))
 
     def update(entityUpdate: Entity => Entity): Update = new Update(
       predicate,
@@ -52,17 +74,4 @@ object EventBuilder {
     )
   }
 
-  def matches[T <: Component : ClassTag](component: T): Entity => Boolean = _.exists[T](_ == component)
-  def matches[T <: Component : ClassTag](optComponent: Option[T]): Entity => Boolean = optComponent match {
-    case None => _ => false
-    case Some(c) => matches[T](c)
-  }
-
-  def matches(entity: Entity): Entity => Boolean = matches(entity[ID])
-
-  def not[T](predicate: T => Boolean): T => Boolean = predicate.andThen(!_)
-
-  implicit def liftUpdate[T <: Component : ClassTag](update: T => T): Entity => Entity = _ apply update
-
-  implicit def liftQuery[T <: Component : ClassTag](predicate: T => Boolean): Entity => Boolean = _ exists predicate
 }

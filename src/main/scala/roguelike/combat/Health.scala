@@ -2,7 +2,6 @@ package roguelike.combat
 
 import core.entity.Entity
 import core.event.CoreEvents._
-import core.event.Event.Triggered
 import core.event.EventBuilder._
 import core.event.{DeleteEntity, Event, EventComponent}
 import roguelike.combat.Health._
@@ -18,11 +17,8 @@ case class Health(current: Int, max: Int) extends EventComponent {
 object Health {
   def apply(max: Int): Health = Health(max, max)
 
-  def decreaseHealthEvent(amount: Int): Triggered[Event] = e =>
-    onIDMatch(e) update decreaseHealth(amount)
-
-  def decreaseHealth(amount: Int): Health => Health = h => {
-    val decreasedHealth = (h.current - amount).max(0)
+  def decreaseHealth(attack: Attack): Health => Health = h => {
+    val decreasedHealth = (h.current - attack.damage).max(0)
     h.copy(current = decreasedHealth)
   }
 

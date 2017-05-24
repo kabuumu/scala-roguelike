@@ -1,13 +1,14 @@
 package data
 
-import core.entity.{Entity, ID}
+import core.entity.{Creator, Entity, ID}
 import data.map.MapConverter._
 import roguelike.actors.Affinity.{Enemy, Player}
 import roguelike.actors.attributes.Speed
 import roguelike.actors.{Affinity, Spawner}
-import roguelike.async.Initiative
-import roguelike.combat.Health
-import roguelike.movement.Direction.Up
+import roguelike.async.{Initiative, Temporary}
+import roguelike.combat.{Attack, Health}
+import roguelike.experience.{Experience, Level}
+import roguelike.movement.Direction.{Direction, Up}
 import roguelike.movement.lineofsight.{RememberedTiles, VisibleTiles}
 import roguelike.movement.{Blocker, Facing, Position}
 import roguelike.scenery.{Floor, Wall}
@@ -26,6 +27,10 @@ object GameData {
     Initiative(max = 10, current = 1),  //Current is 1 to enable automatic events to trigger before first player action
                                         //such as visible tiles
     Health(max = 100),
+
+    Experience(0, 100),
+    Level(1),
+
     Speed(5),
     VisibleTiles(Set.empty),
     RememberedTiles(Set.empty)
@@ -59,4 +64,16 @@ object GameData {
   )
 
   val walls = convert(tileMap)
+
+  def meleeAttackEntity(creator: Entity, pos: Position, dir: Direction, affinity: Affinity) =
+    Entity(
+    new ID,
+    pos.move(dir),
+    Creator(creator),
+    Attack(10),
+    affinity,
+    Temporary,
+    Health(3))
+
+  val DEFAULT_EXP_AMOUNT = 60
 }

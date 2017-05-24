@@ -8,6 +8,7 @@ import roguelike.actors.Affinity
 import roguelike.async.{Initiative, Temporary}
 import roguelike.combat.Projectile.projectileCollision
 import roguelike.movement.{Facing, Position}
+import data.GameData.meleeAttackEntity
 
 /**
   * Created by rob on 08/05/17.
@@ -26,7 +27,7 @@ object Attack {
       pos <- user[Position]
       Facing(dir) <- user[Facing]
       affinity <- user[Affinity]
-    } yield CreateEntity(Entity(new ID, pos.move(dir), Attack(10), affinity, Temporary, Health(3)))
+    } yield CreateEntity(meleeAttackEntity(user, pos, dir, affinity))
   }
 
   val attackEvent: Entity => Update = e => onIDMatch(e) update Initiative.reset trigger meleeAttack

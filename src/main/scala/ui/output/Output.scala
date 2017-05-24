@@ -3,6 +3,7 @@ package ui.output
 import core.entity.Entity
 import core.system.GameState
 import roguelike.combat.Health
+import roguelike.experience.{Experience, Level}
 
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color
@@ -27,9 +28,14 @@ class Output(canvas: Canvas) {
   def drawStats(player: Entity) =
     for {
       Health(currentHealth, maxHealth) <- player[Health]
+      Level(level) <- player[Level]
+      Experience(currentExp, maxExp) <- player[Experience]
     } {
       g2d.setFill(Color.Green)
       g2d.setFont(Font.font(16))
-      g2d.fillText(s"Health: $currentHealth/$maxHealth", canvas.getWidth - 120, 20)
+
+      g2d.fillText(s"Health: $currentHealth/$maxHealth", gameArea.width, 20)
+      g2d.fillText(s"Level: $level", gameArea.width, 40)
+      g2d.fillText(s"XP: $currentExp/$maxExp", gameArea.width, 60)
     }
 }

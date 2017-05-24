@@ -23,11 +23,4 @@ object Movement {
   }
 
   val isImpassable: Entity => Boolean = _[Blocker].isDefined
-
-  val velocityUpdate: Update = event trigger moveByVelocity
-
-  def moveByVelocity: Entity => Option[Update] = e => for {
-    Velocity(_, direction, timer) <- e[Velocity]
-  } yield if (timer == 0) onIDMatch(e) update move(direction) update resetVelocity trigger projectileCollision
-    else onIDMatch(e) update velocityCount
 }

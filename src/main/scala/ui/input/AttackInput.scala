@@ -3,4 +3,4 @@ package ui.input
 /**
   * Created by rob on 28/04/17.
   */
-object Attack extends Input
+object AttackInput extends Input

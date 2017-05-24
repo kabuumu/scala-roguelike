@@ -1,5 +1,7 @@
 package roguelike.movement
 
+import java.lang.Math._
+
 import core.entity.Component
 import roguelike.movement.Direction.Direction
 
@@ -16,6 +18,8 @@ case class Position (x: Int, y: Int) extends Component {
     case Direction.Right => x(_ + 1)
     case Direction.Left => x(_ - 1)
   }
+
+  def distance(pos: Position) = abs(x - pos.x) + abs(y - pos.y)
 }
 
 object Position {

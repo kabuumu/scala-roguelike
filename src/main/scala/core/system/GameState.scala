@@ -2,15 +2,11 @@ package core.system
 
 import core.entity.{Entity, ID}
 import core.event.{CreateEntity, DeleteEntity, Event, Update}
-import roguelike.actors.Affinity
-import roguelike.movement.Position
 
 /**
   * Created by rob on 03/03/17.
   */
 case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
-  val enemyPos = entities.collect{ case e if e.get[Affinity].exists(_.faction == Affinity.Enemy) => e[ID] -> e[Position] } foreach println
-
   def update(events: Iterable[Event]): GameState =
     applyUpdates(events).withCreations(events).withDeletions(events)
 

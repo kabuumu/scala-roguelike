@@ -9,8 +9,8 @@ import scala.annotation.tailrec
   */
 
 class Pathfinder(origin: (Int, Int), target: (Int, Int), blockers: Set[(Int, Int)]) {
-  val path: Option[Seq[(Int, Int)]] = loop(getOptions(origin).sortBy(getDistance(target, _)) map (Seq(_)))
-  val getNext: Option[(Int, Int)] = path flatMap(_.headOption)
+  lazy val path: Option[Seq[(Int, Int)]] = loop(getOptions(origin).sortBy(getDistance(target, _)) map (Seq(_)))
+  lazy val getNext: Option[(Int, Int)] = path flatMap(_.headOption)
   var loopCount = 0
 
   @tailrec
@@ -43,6 +43,8 @@ class Pathfinder(origin: (Int, Int), target: (Int, Int), blockers: Set[(Int, Int
           pathLimit = newPathLimit
         )
       case Nil =>
+//        println(s" Starting Point: $origin, Target: $target")
+//        println(s"Closed paths: ${closedTiles.size}, SuccessPaths: ${newSuccessPaths.size}, Loop Count: $loopCount")
         newSuccessPaths.headOption
     }
   }
@@ -66,6 +68,6 @@ class Pathfinder(origin: (Int, Int), target: (Int, Int), blockers: Set[(Int, Int
 }
 
 object Pathfinder {
-  val PATH_LIMIT = 123
+  val PATH_LIMIT = Integer.MAX_VALUE
 }
 

@@ -31,6 +31,9 @@ class GameArea(canvas: Canvas) {
   }
 
   def drawEntities(state: GameState, player: Entity) = {
+    g2d.setFill(Color.Green)
+    g2d.fillText(s"Enemies ${state.entities.count(_.get[Affinity].exists(_.faction == Affinity.Enemy))}", 0, 16)
+
     state.entities.toSeq.sortBy(getDrawPriority).foreach {
       entity =>
         val Position(x, y) = entity[Position]

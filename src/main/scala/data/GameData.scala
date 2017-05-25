@@ -26,12 +26,12 @@ object GameData {
     Facing(Up),
     Initiative(max = 10, current = 1),  //Current is 1 to enable automatic events to trigger before first player action
                                         //such as visible tiles
-    Health(max = 100),
+    Health(max = 200),
 
     Experience(0, 100),
     Level(1),
 
-    Speed(5),
+    Speed(7),
     VisibleTiles(Set.empty),
     RememberedTiles(Set.empty)
   ))
@@ -40,8 +40,7 @@ object GameData {
     Affinity(Enemy),
     Initiative(max = 21),
     Health(max = 30),
-    Speed(4),
-    Blocker
+    Speed(4)
   )
 
   def wall(position: Position) = Entity(
@@ -58,7 +57,7 @@ object GameData {
   def enemySpawner(enemy: Entity, pos: Position) = Entity(
     pos,
     Spawner(enemy),
-    Initiative(max = 100)
+    Initiative(max = 200)
   )
 
   val walls = convert(tileMap)

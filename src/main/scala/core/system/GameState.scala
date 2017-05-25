@@ -11,7 +11,6 @@ case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
     applyUpdates(events).withCreations(events).withDeletions(events)
 
   private final def applyUpdates(events: Iterable[Event]): GameState = entities
-      .par
       .map(applyEvents(events))
       .unzip match {
       case (newEntities, newEvents) =>

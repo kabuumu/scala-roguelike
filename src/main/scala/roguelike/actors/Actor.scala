@@ -21,19 +21,17 @@ object Actor {
   val defaultMoveAmount = 100
   val defaultFacingAmount = 25
 
-  def actorMove(dir: Direction): Triggered[Update] = e =>  onIDMatch(e) update actorMoveUpdate(dir) trigger actorCollision(e)
+  def actorMove(dir: Direction): Triggered[Update] = e => onIDMatch(e) update actorMoveUpdate(dir) trigger actorCollision(e)
 
-  def actorMoveUpdate(dir: Direction): Entity => Entity = actor => (for {
-    Facing(facing) <- actor[Facing]
-    Speed(speed) <- actor[Speed]
-  } yield {
+  def actorMoveUpdate(dir: Direction): Entity => Entity = actor => {
+    val Facing(facing) = actor[Facing]
+    val Speed(speed) = actor[Speed]
+
     val initiativeIncrease = if(facing == dir) defaultMoveAmount / speed
     else defaultFacingAmount / speed
 
-    moveUpdate(dir)(actor apply increase(initiativeIncrease))
-  })
-    .getOrElse(actor)
-
+    moveUpdate(dir)(actor update increase(initiativeIncrease))
+  }
 
   def actorCollision(originalEntity: Entity): Triggered[Update] = e =>
     onCollision(e) when isImpassable trigger resetEntity(originalEntity)

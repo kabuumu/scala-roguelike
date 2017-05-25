@@ -18,9 +18,9 @@ object Movement {
   def moveEvent(dir: Direction): Triggered[Update] = e => onIDMatch(e) update moveUpdate(dir)
 
   def moveUpdate(dir:Direction): Entity => Entity = {
-    case e if e.exists[Facing](_.dir == dir) => e apply move(dir)
-    case e => e apply changeFacing(dir)
+    case e if e.exists[Facing](_.dir == dir) => e update move(dir)
+    case e => e update changeFacing(dir)
   }
 
-  val isImpassable: Entity => Boolean = _[Blocker].isDefined
+  val isImpassable: Entity => Boolean = _.has[Blocker]
 }

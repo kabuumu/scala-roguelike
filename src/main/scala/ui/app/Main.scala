@@ -51,7 +51,7 @@ object Main extends JFXApp {
   AnimationTimer { now: Long =>
     if(lastDelta < now - 1000000000/120) {
       for {
-        player <- state.entities.find(_[ID] contains playerID)
+        player <- state.entities.find(_[ID] == playerID)
       } {
         val inputEvent = Input(keyCode)
 

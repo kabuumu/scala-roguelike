@@ -25,12 +25,11 @@ class Output(canvas: Canvas) {
     drawStats(player)
   }
 
-  def drawStats(player: Entity) =
-    for {
-      Health(currentHealth, maxHealth) <- player[Health]
-      Level(level) <- player[Level]
-      Experience(currentExp, maxExp) <- player[Experience]
-    } {
+  def drawStats(player: Entity) = {
+      val Health(currentHealth, maxHealth) = player[Health]
+      val Level(level) = player[Level]
+      val Experience(currentExp, maxExp) = player[Experience]
+
       g2d.setFill(Color.Green)
       g2d.setFont(Font.font(16))
 

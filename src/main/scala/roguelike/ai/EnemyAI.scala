@@ -16,15 +16,19 @@ object EnemyAI {
 
   def enemyMoveEvent(player: Entity) = onActivate when hasAffinity(Enemy) trigger getEnemyAction(player)
 
-  def getEnemyAction(player: Entity): Entity => Iterable[Event] = (enemy: Entity) => for {
-    playerPos <- player[Position]
-    enemyPos <- enemy[Position]
-    Facing(enemyFacing) <- enemy[Facing]
-    distance = enemyPos.distance(playerPos)
-    direction = Direction(enemyPos.x, enemyPos.y, playerPos.x, playerPos.y)
-    if distance < 20
-  } yield {
-    if ((distance > 1) || !(enemyFacing == direction)) PathfindingEvent(player)(enemy)
-    else attackEvent(enemy)
+  def getEnemyAction(player: Entity): Entity => Iterable[Event] = (enemy: Entity) => {
+    val playerPos = player[Position]
+
+    val enemyPos = enemy[Position]
+    val Facing(enemyFacing) = enemy[Facing]
+
+    val distance = enemyPos.distance(playerPos)
+    val direction = Direction(enemyPos.x, enemyPos.y, playerPos.x, playerPos.y)
+
+    if (distance < 20) {
+      if ((distance > 1) || !(enemyFacing == direction)) Some(PathfindingEvent(player)(enemy))
+      else Some(attackEvent(enemy))
+    }
+    else None
   }
 }

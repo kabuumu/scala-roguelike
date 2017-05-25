@@ -19,7 +19,7 @@ import roguelike.scenery.{Floor, Wall}
 object GameData {
   val playerID = new ID
 
-  val startingPlayer = Entity(
+  val startingPlayer = new Entity(Seq(
     playerID,
     Affinity(Player),
     Position(3, 3),
@@ -34,30 +34,28 @@ object GameData {
     Speed(5),
     VisibleTiles(Set.empty),
     RememberedTiles(Set.empty)
-  )
+  ))
 
   val enemy = Entity(
     Affinity(Enemy),
-    Initiative(max = 15),
+    Initiative(max = 21),
     Health(max = 30),
-    Speed(4)
+    Speed(4),
+    Blocker
   )
 
   def wall(position: Position) = Entity(
-    new ID,
     Wall,
     Blocker,
     position
   )
 
   def floor(position: Position) = Entity(
-    new ID,
     Floor,
     position
   )
 
   def enemySpawner(enemy: Entity, pos: Position) = Entity(
-    new ID,
     pos,
     Spawner(enemy),
     Initiative(max = 100)
@@ -65,9 +63,7 @@ object GameData {
 
   val walls = convert(tileMap)
 
-  def meleeAttackEntity(creator: Entity, pos: Position, dir: Direction, affinity: Affinity) =
-    Entity(
-    new ID,
+  def meleeAttackEntity(creator: Entity, pos: Position, dir: Direction, affinity: Affinity) = Entity(
     pos.move(dir),
     Creator(creator),
     Attack(10),

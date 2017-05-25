@@ -2,11 +2,15 @@ package core.system
 
 import core.entity.{Entity, ID}
 import core.event.{CreateEntity, DeleteEntity, Event, Update}
+import roguelike.actors.Affinity
+import roguelike.movement.Position
 
 /**
   * Created by rob on 03/03/17.
   */
 case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
+  val enemyPos = entities.collect{ case e if e.get[Affinity].exists(_.faction == Affinity.Enemy) => e[ID] -> e[Position] } foreach println
+
   def update(events: Iterable[Event]): GameState =
     applyUpdates(events).withCreations(events).withDeletions(events)
 
@@ -28,9 +32,9 @@ case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
 
 
   private def withDeletions(events: Iterable[Event]): GameState = {
-    val deletions: Iterable[ID] = events.collect{case DeleteEntity(entity) => entity[ID]}.flatten
+    val deletions: Iterable[ID] = events.collect{case DeleteEntity(entity) => entity[ID]}
 
-    val updatedEntities = entities filterNot(entity => deletions exists entity[ID].contains)
+    val updatedEntities = entities filterNot(entity => deletions.exists(_ == entity[ID]))
 
     GameState(updatedEntities)
   }

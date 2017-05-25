@@ -20,11 +20,11 @@ case class VisibleTiles(tiles: Set[Position]) extends EventComponent {
       f = {
         case (state, origin) =>
           val event: Option[Event] = for {
-            Position(x, y) <- origin[Position]
-            Facing(direction) <- origin[Facing]
+            Position(x, y) <- origin.get[Position]
+            Facing(direction) <- origin.get[Facing]
           } yield {
             val blockers =
-              (state.entities.seq filter (_[Blocker].isDefined) flatMap (_[Position]) map (pos => (pos.x, pos.y))).toSet
+              (state.entities.seq filter (_.has[Blocker]) map (_[Position]) map (pos => (pos.x, pos.y))).toSet
 
             val visibleTiles = for {
               targetX <- xRange(direction, x)

@@ -33,48 +33,46 @@ class GameArea(canvas: Canvas) {
   def drawEntities(state: GameState, player: Entity) = {
     state.entities.toSeq.sortBy(getDrawPriority).foreach {
       entity =>
-        for {
-          Position(x, y) <- entity[Position]
-          Position(playerX, playerY) <- player[Position]
-          VisibleTiles(visibleTiles) <- player[VisibleTiles]
-          RememberedTiles(rememberedTiles) <- player[RememberedTiles]
-        } {
-          val isVisible = visibleTiles.contains(Position(x, y))
-          val isRemembered = rememberedTiles.contains(Position(x, y))
-          val isSceneryEntity = entity[Scenery].isDefined
+        val Position(x, y) = entity[Position]
+        val Position(playerX, playerY) = player[Position]
+        val VisibleTiles(visibleTiles) = player[VisibleTiles]
+        val RememberedTiles(rememberedTiles) = player[RememberedTiles]
 
-          val xOffset = (xTiles / 2) - (playerX - x)
-          val yOffset = (yTiles / 2) - (playerY - y)
+        val isVisible = visibleTiles.contains(Position(x, y))
+        val isRemembered = rememberedTiles.contains(Position(x, y))
+        val isSceneryEntity = entity.has[Scenery]
 
-          val (displayX, displayY) = (xOffset * size, yOffset * size)
+        val xOffset = (xTiles / 2) - (playerX - x)
+        val yOffset = (yTiles / 2) - (playerY - y)
 
-          if (displayX >= 0 && displayX < width && displayY >= 0 && displayY < height) {
-            val colour =
-              if (entity[Attack].isDefined) Color.LightGrey
-              else if (entity[Affinity].exists(_.faction == Affinity.Player)) Color.Green
-              else if (entity[Affinity].exists(_.faction == Affinity.Enemy)) Color.DarkRed
-              else if (entity[Wall].isDefined) Color.Grey.darker
-              else if (entity[Floor].isDefined) Color.SaddleBrown.darker.darker.desaturate
-              else Color.Black
+        val (displayX, displayY) = (xOffset * size, yOffset * size)
 
-            g2d.setFill(colour)
+        if (displayX >= 0 && displayX < width && displayY >= 0 && displayY < height) {
+          val colour =
+            if (entity.has[Attack]) Color.LightGrey
+            else if (entity.exists[Affinity](_.faction == Affinity.Player)) Color.Green
+            else if (entity.exists[Affinity](_.faction == Affinity.Enemy)) Color.DarkRed
+            else if (entity.has[Wall]) Color.Grey.darker
+            else if (entity.has[Floor]) Color.SaddleBrown.darker.darker.desaturate
+            else Color.Black
 
-            def drawTile() = g2d.fillRect(displayX, displayY, size, size)
+          g2d.setFill(colour)
 
-            if (isVisible) drawTile()
-            else if (isRemembered && isSceneryEntity) {
-              g2d.setFill(colour.desaturate.desaturate.darker)
-              drawTile()
-            }
+          def drawTile() = g2d.fillRect(displayX, displayY, size, size)
+
+          if (isVisible) drawTile()
+          else if (isRemembered && isSceneryEntity) {
+            g2d.setFill(colour.desaturate.desaturate.darker)
+            drawTile()
           }
         }
     }
+  }
 
-    def getDrawPriority: Entity => Int = {
-      case e if e[Floor].isDefined => 0
-      case e if e[Blocker].isDefined => 0
-      case e if e[Attack].isDefined => 2
-      case _ => 1
-    }
+  def getDrawPriority: Entity => Int = {
+    case e if e.has[Floor] => 0
+    case e if e.has[Blocker] => 0
+    case e if e.has[Attack] => 2
+    case _ => 1
   }
 }

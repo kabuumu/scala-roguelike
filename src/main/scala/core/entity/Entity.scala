@@ -6,9 +6,8 @@ import scala.reflect.ClassTag
   * Created by rob on 03/03/17.
   */
 case class Entity(components: Iterable[Component]) extends Iterable[Component] {
-  def apply[T <: Component : ClassTag] = get[T]
-
-  def apply[T <: Component : ClassTag](op: T => T) = ~> (op)
+  def apply[T <: Component](implicit manifest: Manifest[T]) =
+    get[T].getOrElse(throw new MissingComponentException[T](this))
 
   def +(component: Component) = Entity(components.++(Seq(component)))
 
@@ -23,7 +22,7 @@ case class Entity(components: Iterable[Component]) extends Iterable[Component] {
 
   def get[T <: Component : ClassTag]: Option[T] = components.collectFirst { case c: T => c }
 
-  def get[T <: Component : ClassTag, V](f: T => V): Option[V] = get[T].map(f)
+  def has[T <: Component : ClassTag] = get[T].isDefined
 
   def exists[T <: Component : ClassTag](pred: T => Boolean): Boolean =
     components.exists {
@@ -35,5 +34,5 @@ case class Entity(components: Iterable[Component]) extends Iterable[Component] {
 }
 
 object Entity {
-  def apply(components: Component*) = new Entity(components)
+  def apply(components: Component*): Entity = new Entity(Seq(new ID) ++ components)
 }

@@ -9,29 +9,28 @@ import scala.annotation.tailrec
   */
 
 class Pathfinder(origin: (Int, Int), target: (Int, Int), blockers: Set[(Int, Int)]) {
+  val path: Option[Seq[(Int, Int)]] = loop(getOptions(origin).sortBy(getDistance(target, _)) map (Seq(_)))
+  val getNext: Option[(Int, Int)] = path flatMap(_.headOption)
   var loopCount = 0
-
-  val path: Seq[(Int, Int)] = loop(getOptions(origin).sortBy(getDistance(target, _)) map (Seq(_)))
-  val getNext: (Int, Int) = path.head
 
   @tailrec
   private def loop(openPaths: Seq[Seq[(Int, Int)]],
                    closedTiles: Map[(Int, Int), Int] = Map(origin -> 0),
                    successPaths: Seq[Seq[(Int, Int)]] = Nil,
                    pathLimit: Int = PATH_LIMIT
-                  ): Seq[(Int, Int)] = {
+                  ): Option[Seq[(Int, Int)]] = {
     loopCount += 1
 
-    val newSuccessPaths = successPaths ++ openPaths.filter(_.contains(target)) sortBy(_.size)
+    val newSuccessPaths = successPaths ++ openPaths.filter(_.contains(target)) sortBy (_.size)
     val newPathLimit = newSuccessPaths.headOption.fold(pathLimit)(_.size)
 
-    openPaths filter(_.size < newPathLimit) match {
+    openPaths filter (_.size < newPathLimit) match {
       case head :: tail =>
         val nextSteps: Seq[Seq[(Int, Int)]] = getOptions(head.last).sortBy(getDistance(target, _))
           .filterNot(tile => closedTiles.get(tile).exists(_ <= head.size + 1))
           .map(head :+ _)
 
-        val newPaths = nextSteps ++ openPaths.tail sortBy(_.size)
+        val newPaths = nextSteps ++ openPaths.tail sortBy (_.size)
 
         val newClosedTiles = closedTiles ++ openPaths
           .map(path => (path.last, path.size))
@@ -44,7 +43,7 @@ class Pathfinder(origin: (Int, Int), target: (Int, Int), blockers: Set[(Int, Int
           pathLimit = newPathLimit
         )
       case Nil =>
-        newSuccessPaths.headOption.getOrElse(Seq(origin))
+        newSuccessPaths.headOption
     }
   }
 

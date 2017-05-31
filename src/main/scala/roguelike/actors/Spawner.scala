@@ -16,7 +16,7 @@ case class Spawner(entity: Entity) extends EventComponent {
 
   lazy val spawnEvent: ((GameState, Entity)) => (Entity, Seq[Event]) = {
     case (state, spawner) =>
-      val Initiative(currentInitiative, _) = spawner[Initiative]
+      val currentInitiative = spawner[Initiative].current
       val pos@Position(x, y) = spawner[Position]
 
       val surroundingPositions = for {
@@ -29,8 +29,7 @@ case class Spawner(entity: Entity) extends EventComponent {
       }.isDefined
 
       val (newEntity: Entity, events: Seq[Event]) =
-        //TODO - Discover why this isn't working
-        if (isBlocked/* || currentInitiative != 0*/) {
+        if (isBlocked || currentInitiative != 0) {
           (spawner, Nil)
         }
         else {

@@ -24,7 +24,7 @@ object GameData {
     Affinity(Player),
     Position(1, 1),
     Facing(Up),
-    Initiative(max = 10, current = 1),  //Current is 1 to enable automatic events to trigger before first player action
+    Initiative(max = 10, current = 2),  //Current is 2 to enable automatic events to trigger before first player action
                                         //such as visible tiles
     Health(max = 200),
 

@@ -7,6 +7,7 @@ import data.GameData._
 import roguelike.ai.EnemyAI
 import roguelike.async.Initiative._
 import roguelike.movement.Position
+import roguelike.movement.lineofsight.VisibleTiles
 import ui.input.Input
 import ui.output.Output
 import ui.output.OutputConfig._
@@ -36,7 +37,7 @@ object Main extends JFXApp {
     startingPlayer,
     enemySpawner(enemy, Position(8, 7)),
     enemySpawner(enemy, Position(30, 7))
-  ) ++ walls)
+  ) ++ walls).update(Seq(triggerEntityEvents))
 
   stage = new PrimaryStage {
     title = "scala-roguelike"
@@ -58,16 +59,15 @@ object Main extends JFXApp {
 
         if((player exists isReady) && inputEvent.isDefined) keyCode = null
 
-        val events = if ((player exists notReady) || inputEvent.isDefined) {
-          Seq(
+        if ((player exists notReady) || inputEvent.isDefined) {
+          val events = Seq(
             EnemyAI.enemyMoveEvent(player),
             triggerEntityEvents
           ) ++ (inputEvent map (_.apply(player)))
-        }
-        else Nil
 
-        output.update(state, player)
-        state = state.update(events)
+          output.update(state, player)
+          state = state.update(events)
+        }
 
         lastDelta = now
       }

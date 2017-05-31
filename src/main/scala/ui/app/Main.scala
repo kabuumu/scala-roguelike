@@ -34,8 +34,8 @@ object Main extends JFXApp {
 
   var state: GameState = GameState(Seq(
     startingPlayer,
-    enemySpawner(enemy, Position(10, 10)),
-    enemySpawner(enemy, Position(15, 10))
+    enemySpawner(enemy, Position(8, 7)),
+    enemySpawner(enemy, Position(30, 7))
   ) ++ walls)
 
   stage = new PrimaryStage {

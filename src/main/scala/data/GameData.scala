@@ -10,7 +10,7 @@ import roguelike.combat.{Attack, Health}
 import roguelike.experience.{Experience, Level}
 import roguelike.movement.Direction.{Direction, Up}
 import roguelike.movement.lineofsight.{RememberedTiles, VisibleTiles}
-import roguelike.movement.{Blocker, Facing, Position}
+import roguelike.movement._
 import roguelike.scenery.{Floor, Wall}
 
 /**
@@ -22,7 +22,7 @@ object GameData {
   val startingPlayer = new Entity(Seq(
     playerID,
     Affinity(Player),
-    Position(3, 3),
+    Position(1, 1),
     Facing(Up),
     Initiative(max = 10, current = 1),  //Current is 1 to enable automatic events to trigger before first player action
                                         //such as visible tiles
@@ -40,7 +40,8 @@ object GameData {
     Affinity(Enemy),
     Initiative(max = 21),
     Health(max = 30),
-    Speed(4)
+    Speed(4),
+    Blocker
   )
 
   def wall(position: Position) = Entity(
@@ -57,10 +58,10 @@ object GameData {
   def enemySpawner(enemy: Entity, pos: Position) = Entity(
     pos,
     Spawner(enemy),
-    Initiative(max = 200)
+    Initiative(max = 100)
   )
 
-  val walls = convert(tileMap)
+  val walls = convert(newMap)
 
   def meleeAttackEntity(creator: Entity, pos: Position, dir: Direction, affinity: Affinity) = Entity(
     pos.move(dir),

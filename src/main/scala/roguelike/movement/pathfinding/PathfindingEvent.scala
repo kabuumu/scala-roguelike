@@ -1,12 +1,12 @@
 package roguelike.movement.pathfinding
 
-import core.entity.{Entity, ID}
+import core.entity.Entity
+import core.event.CoreEvents._
 import core.event.EventBuilder._
 import core.event.Update
 import roguelike.actors.Actor
-import roguelike.movement.{Blocker, Direction, Position}
-import core.event.CoreEvents._
 import roguelike.async.Initiative
+import roguelike.movement.{Blocker, Direction, Position}
 
 
 /**
@@ -22,7 +22,6 @@ object PathfindingEvent {
 
         val blockers =
           (state.entities.seq filter (_.has[Blocker]) map (_[Position]) map (pos => (pos.x, pos.y))).toSet
-        print(entity[ID])
         val pathfinder = new Pathfinder(x -> y, targetX -> targetY, blockers)
 
         val event = pathfinder.getNext match {

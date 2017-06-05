@@ -7,7 +7,6 @@ import data.GameData._
 import roguelike.ai.EnemyAI
 import roguelike.async.Initiative._
 import roguelike.movement.Position
-import roguelike.movement.lineofsight.VisibleTiles
 import ui.input.Input
 import ui.output.Output
 import ui.output.OutputConfig._
@@ -19,7 +18,7 @@ import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.input.{KeyCode, KeyEvent}
+import scalafx.scene.input.KeyCode
 
 /**
   * Created by rob on 13/04/16.
@@ -29,14 +28,14 @@ object Main extends JFXApp {
   val frameRate = 1
   //200ms
   var lastDelta = 0L
-  var keyCode: KeyCode = _
+  var keyCodes: Set[KeyCode] = Set.empty
 
   val output = new Output(canvas)
 
   var state: GameState = GameState(Seq(
     startingPlayer,
-    enemySpawner(enemy, Position(8, 7)),
-    enemySpawner(enemy, Position(30, 7))
+    enemySpawner(orc, Position(8, 7)),
+    enemySpawner(goblin, Position(30, 7))
   ) ++ walls).update(Seq(triggerEntityEvents))
 
   stage = new PrimaryStage {
@@ -45,25 +44,27 @@ object Main extends JFXApp {
       content = canvas
 
       onKeyPressed = {
-        key: KeyEvent => keyCode = key.code
+        key => keyCodes += key.code
+      }
+
+      onKeyReleased = {
+        key => keyCodes -= key.code
       }
     }
   }
 
   AnimationTimer { now: Long =>
-    if(lastDelta < now - 1000000000/120) {
+    if(lastDelta < now - 1000000000/60) {
       for {
         player <- state.entities.find(_[ID] == playerID)
       } {
-        val inputEvent = Input(keyCode)
+        val inputEvents = Input(keyCodes, player)
 
-        if((player exists isReady) && inputEvent.isDefined) keyCode = null
-
-        if ((player exists notReady) || inputEvent.isDefined) {
+        if ((player exists notReady) || inputEvents.nonEmpty) {
           val events = Seq(
             EnemyAI.enemyMoveEvent(player),
             triggerEntityEvents
-          ) ++ (inputEvent map (_.apply(player)))
+          ) ++ inputEvents
 
           output.update(state, player)
           state = state.update(events)

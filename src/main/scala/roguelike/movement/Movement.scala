@@ -17,8 +17,8 @@ import roguelike.movement.Facing._
 object Movement {
   def moveEvent(dir: Direction): Triggered[Update] = e => onIDMatch(e) update moveUpdate(dir)
 
-  def moveUpdate(dir:Direction): Entity => Entity = {
-    case e if e.exists[Facing](_.dir == dir) => e update move(dir)
+  def moveUpdate(dir:Direction, isStrafing: Boolean = false): Entity => Entity = {
+    case e if e.exists[Facing](_.dir == dir) || isStrafing => e update move(dir)
     case e => e update changeFacing(dir)
   }
 

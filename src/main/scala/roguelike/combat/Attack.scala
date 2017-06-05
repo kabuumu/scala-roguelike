@@ -23,13 +23,20 @@ case class Attack(damage: Int) extends EventComponent {
 }
 
 object Attack {
+  val BASE_DAMAGE = 10
+
   val meleeAttack: Entity => Event = user => {
     val pos = user[Position]
     val Facing(dir) = user[Facing]
     val affinity = user[Affinity]
 
-    CreateEntity(meleeAttackEntity(user, pos, dir, affinity))
+    CreateEntity(meleeAttackEntity(user, pos, dir, affinity, BASE_DAMAGE))
   }
 
-  val attackEvent: Entity => Update = e => onIDMatch(e) update Initiative.increase(120 / e[Speed].value) trigger meleeAttack
+  val attackEvent: Entity => Update = e => (
+    onIDMatch(e)
+      update Initiative.increase(120 / e[Speed].value)
+      trigger meleeAttack
+      update (_.-[AttackMode])
+    )
 }

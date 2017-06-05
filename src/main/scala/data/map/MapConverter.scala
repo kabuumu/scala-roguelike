@@ -12,8 +12,8 @@ object MapConverter {
     tileMap.zipWithIndex.flatMap {
       case (row, y) =>
         row.zipWithIndex.collect {
-          case ('X', x) => wall(Position(x,y))
-          case ('O', x) => floor(Position(x,y))
+          case ('X', x) => wall(Position(x, y))
+          case ('O', x) => floor(Position(x, y))
         }
     }
 
@@ -87,5 +87,4 @@ object MapConverter {
 
 
     )
-
 }

@@ -36,11 +36,19 @@ object GameData {
     RememberedTiles(Set.empty)
   ))
 
-  val enemy = Entity(
+  val orc = Entity(
     Affinity(Enemy),
     Initiative(max = 21),
     Health(max = 30),
     Speed(4),
+    Blocker
+  )
+
+  val goblin = Entity(
+    Affinity(Enemy),
+    Initiative(max = 7),
+    Health(max = 7),
+    Speed(9),
     Blocker
   )
 
@@ -63,10 +71,10 @@ object GameData {
 
   val walls = convert(newMap)
 
-  def meleeAttackEntity(creator: Entity, pos: Position, dir: Direction, affinity: Affinity) = Entity(
+  def meleeAttackEntity(creator: Entity, pos: Position, dir: Direction, affinity: Affinity, damage: Int) = Entity(
     pos.move(dir),
     Creator(creator),
-    Attack(10),
+    Attack(damage),
     affinity,
     Temporary,
     Health(3))

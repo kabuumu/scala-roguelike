@@ -22,7 +22,7 @@ object GameData {
   val startingPlayer = new Entity(Seq(
     playerID,
     Affinity(Player),
-    Position(1, 1),
+    Position(20, 20),
     Facing(Up),
     Initiative(max = 10, current = 2),  //Current is 2 to enable automatic events to trigger before first player action
                                         //such as visible tiles
@@ -69,7 +69,7 @@ object GameData {
     Initiative(max = 100)
   )
 
-  val walls = convert(newMap)
+  val walls = convert(arenaMap)
 
   def meleeAttackEntity(creator: Entity, pos: Position, dir: Direction, affinity: Affinity, damage: Int) = Entity(
     pos.move(dir),

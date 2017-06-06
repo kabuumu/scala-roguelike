@@ -34,8 +34,8 @@ object Main extends JFXApp {
 
   var state: GameState = GameState(Seq(
     startingPlayer,
-    enemySpawner(orc, Position(8, 7)),
-    enemySpawner(goblin, Position(30, 7))
+    enemySpawner(orc, Position(1, 19)),
+    enemySpawner(goblin, Position(38, 19))
   ) ++ walls).update(Seq(triggerEntityEvents))
 
   stage = new PrimaryStage {

@@ -1,5 +1,7 @@
 package roguelike.movement.lineofsight
 
+import java.lang.Math.abs
+
 import core.entity.Entity
 import core.event.CoreEvents._
 import core.event.EventBuilder._
@@ -30,8 +32,8 @@ case class VisibleTiles(tiles: Set[Position]) extends EventComponent {
               targetX <- xRange(direction, x)
               targetY <- yRange(direction, y)
               if (direction match {
-                case Left | Right => Math.abs(targetY - y) / gradDiv < Math.abs(targetX - x) + gradMod
-                case Up | Down => Math.abs(targetX - x) / gradDiv < Math.abs(targetY - y) + gradMod
+                case Left | Right => abs(targetY - y) / gradDiv < abs(targetX - x) + gradMod
+                case Up | Down => abs(targetX - x) / gradDiv < abs(targetY - y) + gradMod
               })
               if isVisible(x, y, targetX, targetY, blockers)
             } yield Position(targetX, targetY)
@@ -48,17 +50,23 @@ object VisibleTiles {
   val gradMod = 1
   val gradDiv = 2
 
+  val longRange = 10
+  val shortRange = 8
+  val backRange = 0
+
   def set(tiles: Iterable[Position]): VisibleTiles => VisibleTiles = _ => VisibleTiles(tiles.toSet)
 
   def xRange(direction: Direction, x: Int) = direction match {
-    case Up | Down => x - 5 to x + 5
-    case Left => x - 10 to x
-    case Right => x to x + 10
+    case Up | Down => x - 10 to x + 10
+    case Left => x - longRange to x + backRange
+    case Right => x - backRange to x + longRange
   }
 
   def yRange(direction: Direction, y: Int) = direction match {
-    case Left | Right => y - 5 to y + 5
-    case Down => y to y + 10
-    case Up => y - 10 to y
+    case Left | Right => y - shortRange to y + shortRange
+    case Down => y - backRange to y + longRange
+    case Up => y - longRange to y + backRange
   }
+
+  def sq(n: Int) = n * n
 }

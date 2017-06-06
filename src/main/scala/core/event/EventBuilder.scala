@@ -25,7 +25,7 @@ object EventBuilder {
 
   def not[T](predicate: T => Boolean): T => Boolean = predicate.andThen(!_)
 
-  implicit def convertUpdate[T <: Component : ClassTag](update: T => T): Entity => Entity = _ apply update
+  implicit def convertUpdate[T <: Component : ClassTag](op: T => T): Entity => Entity = _ update op
 
   implicit def lift[T <: Component : ClassTag, F[_]](update: F[T => T])(implicit functor: Functor[F], f: (T => T) => Entity => Entity): F[Entity => Entity] =
     functor.map(update)(f)

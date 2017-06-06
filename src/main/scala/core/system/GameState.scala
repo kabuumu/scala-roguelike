@@ -11,7 +11,6 @@ case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
     applyUpdates(events).withCreations(events).withDeletions(events)
 
   private final def applyUpdates(events: Iterable[Event]): GameState = entities
-      .par
       .map(applyEvents(events))
       .unzip match {
       case (newEntities, newEvents) =>
@@ -28,9 +27,9 @@ case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
 
 
   private def withDeletions(events: Iterable[Event]): GameState = {
-    val deletions: Iterable[ID] = events.collect{case DeleteEntity(entity) => entity[ID]}.flatten
+    val deletions: Iterable[ID] = events.collect{case DeleteEntity(entity) => entity[ID]}
 
-    val updatedEntities = entities filterNot(entity => deletions exists entity[ID].contains)
+    val updatedEntities = entities filterNot(entity => deletions.exists(_ == entity[ID]))
 
     GameState(updatedEntities)
   }

@@ -16,5 +16,5 @@ sealed trait Floor extends Scenery
 object Floor extends Floor
 
 object Scenery{
-  val isScenery: Entity => Boolean = _[Scenery].isDefined
+  val isScenery: Entity => Boolean = _.has[Scenery]
 }

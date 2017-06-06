@@ -18,7 +18,7 @@ import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.input.{KeyCode, KeyEvent}
+import scalafx.scene.input.KeyCode
 
 /**
   * Created by rob on 13/04/16.
@@ -28,14 +28,15 @@ object Main extends JFXApp {
   val frameRate = 1
   //200ms
   var lastDelta = 0L
-  var keyCode: KeyCode = _
+  var keyCodes: Set[KeyCode] = Set.empty
 
   val output = new Output(canvas)
 
   var state: GameState = GameState(Seq(
     startingPlayer,
-    enemySpawner(enemy, Position(10, 10))
-  ) ++ walls)
+    enemySpawner(orc, Position(1, 19)),
+    enemySpawner(goblin, Position(38, 19))
+  ) ++ walls).update(Seq(triggerEntityEvents))
 
   stage = new PrimaryStage {
     title = "scala-roguelike"
@@ -43,30 +44,31 @@ object Main extends JFXApp {
       content = canvas
 
       onKeyPressed = {
-        key: KeyEvent => keyCode = key.code
+        key => keyCodes += key.code
+      }
+
+      onKeyReleased = {
+        key => keyCodes -= key.code
       }
     }
   }
 
   AnimationTimer { now: Long =>
-    if(lastDelta < now - 1000000000/120) {
+    if(lastDelta < now - 1000000000/60) {
       for {
-        player <- state.entities.find(_[ID] contains playerID)
+        player <- state.entities.find(_[ID] == playerID)
       } {
-        val inputEvent = Input(keyCode)
+        val inputEvents = Input(keyCodes, player)
 
-        if((player exists isReady) && inputEvent.isDefined) keyCode = null
-
-        val events = if ((player exists notReady) || inputEvent.isDefined) {
-          Seq(
+        if ((player exists notReady) || inputEvents.nonEmpty) {
+          val events = Seq(
             EnemyAI.enemyMoveEvent(player),
             triggerEntityEvents
-          ) ++ (inputEvent map (_.apply(player)))
-        }
-        else Nil
+          ) ++ inputEvents
 
-        output.update(state, player)
-        state = state.update(events)
+          output.update(state, player)
+          state = state.update(events)
+        }
 
         lastDelta = now
       }

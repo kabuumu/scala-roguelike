@@ -3,7 +3,7 @@ package roguelike.async
 import core.entity.Entity
 import core.event.CoreEvents._
 import core.event.EventBuilder._
-import core.event.{CoreEvents, Event, EventComponent}
+import core.event.{Event, EventComponent}
 import roguelike.async.Initiative._
 
 /**

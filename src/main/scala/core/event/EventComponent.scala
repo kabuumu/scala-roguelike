@@ -17,7 +17,7 @@ object EventComponent {
     case EventComponent(events) => events(entity)
   }.flatten
 
-  val triggerEntityEvents = event when (_[EventComponent].isDefined) trigger getEntityEvent
+  val triggerEntityEvents = event when (_.has[EventComponent]) trigger getEntityEvent
 
   def unapply(component: EventComponent): Option[Entity => Iterable[Event]] = Some(component.entityEvents)
 }

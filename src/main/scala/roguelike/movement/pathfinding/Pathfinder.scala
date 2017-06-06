@@ -1,51 +1,62 @@
 package roguelike.movement.pathfinding
 
-import roguelike.movement.pathfinding.Pathfinder.PATH_LIMIT
-
 import scala.annotation.tailrec
+import Pathfinder._
 
 /**
   * Created by rob on 15/05/17.
   */
 
 class Pathfinder(origin: (Int, Int), target: (Int, Int), blockers: Set[(Int, Int)]) {
+  lazy val path: Option[Seq[(Int, Int)]] = loop()
+  lazy val getNext: Option[(Int, Int)] = path flatMap (_.headOption)
   var loopCount = 0
 
-  val path: Seq[(Int, Int)] = loop(getOptions(origin).sortBy(getDistance(target, _)) map (Seq(_)))
-  val getNext: (Int, Int) = path.head
-
   @tailrec
-  private def loop(openPaths: Seq[Seq[(Int, Int)]],
-                   closedTiles: Map[(Int, Int), Int] = Map(origin -> 0),
-                   successPaths: Seq[Seq[(Int, Int)]] = Nil,
-                   pathLimit: Int = PATH_LIMIT
-                  ): Seq[(Int, Int)] = {
+  private def loop(
+                    openPaths: Seq[ScoredTile] = Seq(
+                      ScoredTile(
+                        score = getDistance(origin, target),
+                        parent = origin,
+                        position = origin
+                      )
+                    ),
+                    closedTiles: Seq[ScoredTile] = Seq.empty
+                  ): Option[Seq[(Int, Int)]] = {
     loopCount += 1
 
-    val newSuccessPaths = successPaths ++ openPaths.filter(_.contains(target)) sortBy(_.size)
-    val newPathLimit = newSuccessPaths.headOption.fold(pathLimit)(_.size)
+    openPaths match {
+      case currentTile :: tail =>
+        val ScoredTile(score, _, pos) = currentTile
 
-    openPaths filter(_.size < newPathLimit) match {
-      case head :: tail =>
-        val nextSteps: Seq[Seq[(Int, Int)]] = getOptions(head.last).sortBy(getDistance(target, _))
-          .filterNot(tile => closedTiles.get(tile).exists(_ <= head.size + 1))
-          .map(head :+ _)
+        val options = getOptions(pos)
+          .filterNot(closedTiles.contains)
+          .map (
+            newPos => ScoredTile(score + 1 + getDistance(newPos, target), pos, newPos)
+          )
 
-        val newPaths = nextSteps ++ openPaths.tail sortBy(_.size)
+        currentTile match {
+          case ScoredTile(_, parent, currentTarget) if currentTarget == target || loopCount > LOOP_LIMIT =>
+            @tailrec
+            def getPath(path: Seq[(Int, Int)]): Seq[(Int, Int)] = {
+              if (path.head == origin) path.tail
+              else getPath((closedTiles.find(_.position == path.head).map(_.parent) ++ path).toSeq)
+            }
+            Some(getPath(Seq(parent)))
 
-        val newClosedTiles = closedTiles ++ openPaths
-          .map(path => (path.last, path.size))
-          .filterNot { case (tile, cost) => closedTiles.get(tile).exists(_ > cost) }
+          case _ =>
+            val newOpenPaths =
+              ((options ++ tail) groupBy (_.position) map(_._2.sortBy(_.score).head)).toSeq.sortBy(_.score)
 
-        loop(
-          openPaths = newPaths.diff(newSuccessPaths),
-          closedTiles = newClosedTiles,
-          successPaths = newSuccessPaths,
-          pathLimit = newPathLimit
-        )
+            val newClosedTiles = closedTiles :+ currentTile
+
+            loop(newOpenPaths, newClosedTiles)
+        }
       case Nil =>
-        newSuccessPaths.headOption.getOrElse(Seq(origin))
+        None
     }
+
+
   }
 
   private def getOptions(origin: (Int, Int)) = {
@@ -67,6 +78,9 @@ class Pathfinder(origin: (Int, Int), target: (Int, Int), blockers: Set[(Int, Int
 }
 
 object Pathfinder {
-  val PATH_LIMIT = 123
+  val PATH_LIMIT = Integer.MAX_VALUE
+  val LOOP_LIMIT = 250
 }
+
+case class ScoredTile(score: Int, parent: (Int, Int), position: (Int, Int))
 

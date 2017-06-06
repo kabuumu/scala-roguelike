@@ -2,7 +2,8 @@ package ui.output
 
 import core.entity.Entity
 import core.system.GameState
-import roguelike.combat.Health
+import roguelike.async.Initiative
+import roguelike.combat.{AttackMode$, Health}
 import roguelike.experience.{Experience, Level}
 
 import scalafx.scene.canvas.Canvas
@@ -25,17 +26,18 @@ class Output(canvas: Canvas) {
     drawStats(player)
   }
 
-  def drawStats(player: Entity) =
-    for {
-      Health(currentHealth, maxHealth) <- player[Health]
-      Level(level) <- player[Level]
-      Experience(currentExp, maxExp) <- player[Experience]
-    } {
+  def drawStats(player: Entity) = {
+      val Health(currentHealth, maxHealth) = player[Health]
+      val Level(level) = player[Level]
+      val Experience(currentExp, maxExp) = player[Experience]
+      val Initiative(_, init) = player[Initiative]
+
       g2d.setFill(Color.Green)
       g2d.setFont(Font.font(16))
 
       g2d.fillText(s"Health: $currentHealth/$maxHealth", gameArea.width, 20)
       g2d.fillText(s"Level: $level", gameArea.width, 40)
       g2d.fillText(s"XP: $currentExp/$maxExp", gameArea.width, 60)
+      g2d.fillText(s"Initiative: $init", gameArea.width, 80)
     }
 }

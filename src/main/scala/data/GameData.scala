@@ -71,8 +71,8 @@ object GameData {
 
   val walls = convert(arenaMap)
 
-  def meleeAttackEntity(creator: Entity, pos: Position, dir: Direction, affinity: Affinity, damage: Int) = Entity(
-    pos.move(dir),
+  def meleeAttackEntity(creator: Entity, pos: Position, affinity: Affinity, damage: Int) = Entity(
+    pos,
     Creator(creator),
     Attack(damage),
     affinity,

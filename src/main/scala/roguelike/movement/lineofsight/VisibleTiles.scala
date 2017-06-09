@@ -29,12 +29,8 @@ case class VisibleTiles(tiles: Set[Position]) extends EventComponent {
               (state.entities.seq filter (_.has[Blocker]) map (_[Position]) map (pos => (pos.x, pos.y))).toSet
 
             val visibleTiles = for {
-              targetX <- xRange(direction, x)
-              targetY <- yRange(direction, y)
-              if (direction match {
-                case Left | Right => abs(targetY - y) / gradDiv < abs(targetX - x) + gradMod
-                case Up | Down => abs(targetX - x) / gradDiv < abs(targetY - y) + gradMod
-              })
+              targetX <- x - range to x + range
+              targetY <- y - range to y + range
               if isVisible(x, y, targetX, targetY, blockers)
             } yield Position(targetX, targetY)
 
@@ -47,26 +43,9 @@ case class VisibleTiles(tiles: Set[Position]) extends EventComponent {
 }
 
 object VisibleTiles {
-  val gradMod = 1
-  val gradDiv = 2
-
-  val longRange = 10
-  val shortRange = 8
-  val backRange = 0
+  val range = 10
 
   def set(tiles: Iterable[Position]): VisibleTiles => VisibleTiles = _ => VisibleTiles(tiles.toSet)
-
-  def xRange(direction: Direction, x: Int) = direction match {
-    case Up | Down => x - 10 to x + 10
-    case Left => x - longRange to x + backRange
-    case Right => x - backRange to x + longRange
-  }
-
-  def yRange(direction: Direction, y: Int) = direction match {
-    case Left | Right => y - shortRange to y + shortRange
-    case Down => y - backRange to y + longRange
-    case Up => y - longRange to y + backRange
-  }
 
   def sq(n: Int) = n * n
 }

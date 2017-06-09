@@ -7,8 +7,9 @@ import data.GameData._
 import roguelike.ai.EnemyAI
 import roguelike.async.Initiative._
 import roguelike.movement.Position
-import ui.input.Input
-import ui.output.Output
+import ui.input.{InputController, InputState, KeyEventConsumer}
+import ui.input.InputState.InputState
+import ui.output.OutputController
 import ui.output.OutputConfig._
 
 import scala.language.postfixOps
@@ -25,12 +26,11 @@ import scalafx.scene.input.KeyCode
   */
 object Main extends JFXApp {
   val canvas = new Canvas(canvasWidth, canvasHeight)
-  val frameRate = 1
   //200ms
   var lastDelta = 0L
-  var keyCodes: Set[KeyCode] = Set.empty
-
-  val output = new Output(canvas)
+  val output = new OutputController(canvas)
+  var keyConsumer = new KeyEventConsumer
+  val input = new InputController
 
   var state: GameState = GameState(Seq(
     startingPlayer,
@@ -43,22 +43,19 @@ object Main extends JFXApp {
     scene = new Scene {
       content = canvas
 
-      onKeyPressed = {
-        key => keyCodes += key.code
-      }
-
-      onKeyReleased = {
-        key => keyCodes -= key.code
-      }
+      onKeyPressed = event => keyConsumer += event
+      onKeyReleased = event => keyConsumer -= event
     }
   }
 
   AnimationTimer { now: Long =>
-    if(lastDelta < now - 1000000000/60) {
+    if(lastDelta < now - 1000000000/120) {
       for {
         player <- state.entities.find(_[ID] == playerID)
       } {
-        val inputEvents = Input(keyCodes, player)
+        val inputEvents = input.getInputEvents(player, keyConsumer)
+
+        output.update(state, player, input)
 
         if ((player exists notReady) || inputEvents.nonEmpty) {
           val events = Seq(
@@ -66,7 +63,6 @@ object Main extends JFXApp {
             triggerEntityEvents
           ) ++ inputEvents
 
-          output.update(state, player)
           state = state.update(events)
         }
 

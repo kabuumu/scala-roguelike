@@ -1,12 +1,12 @@
 package roguelike.movement
 
-import ui.input.Input
+import ui.input.KeyEventConsumer.InputKey
 
 /**
   * Created by rob on 21/06/16.
   */
 object Direction {
-  sealed trait Direction extends Input
+  sealed trait Direction extends InputKey
   case object Up extends Direction
   case object Down extends Direction
   case object Left extends Direction

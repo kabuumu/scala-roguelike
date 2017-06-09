@@ -5,6 +5,7 @@ import core.system.GameState
 import roguelike.async.Initiative
 import roguelike.combat.{AttackMode$, Health}
 import roguelike.experience.{Experience, Level}
+import ui.input.InputController
 
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.paint.Color
@@ -13,16 +14,16 @@ import scalafx.scene.text.Font
 /**
   * Created by rob on 13/04/16.
   */
-class Output(canvas: Canvas) {
+class OutputController(canvas: Canvas) {
   val g2d = canvas.getGraphicsContext2D
   lazy val gameArea = new GameArea(canvas)
 
-  def update(state: GameState, player: Entity): Unit = {
+  def update(state: GameState, player: Entity, input: InputController): Unit = {
     g2d.clearRect(0, 0, canvas.getWidth, canvas.getHeight)
     g2d.setFill(Color.Black)
     g2d.fillRect(0, 0, canvas.getWidth, canvas.getHeight)
 
-    gameArea.update(state, player)
+    gameArea.update(state, player, input)
     drawStats(player)
   }
 

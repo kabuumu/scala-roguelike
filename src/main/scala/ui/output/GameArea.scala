@@ -7,6 +7,7 @@ import roguelike.combat.Attack
 import roguelike.movement.lineofsight.{RememberedTiles, VisibleTiles}
 import roguelike.movement.{Blocker, Position}
 import roguelike.scenery.{Floor, Scenery, Wall}
+import ui.input.InputController
 import ui.output.OutputConfig._
 
 import scalafx.scene.canvas.Canvas
@@ -23,17 +24,14 @@ class GameArea(canvas: Canvas) {
   val xTiles = width / size
   val yTiles = height / size
 
-  def update(state: GameState, player: Entity) = {
+  def update(state: GameState, player: Entity, input: InputController) = {
     g2d.setFill(Color.Black.brighter.brighter)
     g2d.fillRect(0, 0, width, height)
 
-    drawEntities(state, player)
+    drawEntities(state, player, input)
   }
 
-  def drawEntities(state: GameState, player: Entity) = {
-    g2d.setFill(Color.Green)
-    g2d.fillText(s"Enemies ${state.entities.count(_.get[Affinity].exists(_.faction == Affinity.Enemy))}", 0, 16)
-
+  def drawEntities(state: GameState, player: Entity, input: InputController) = {
     state.entities.toSeq.sortBy(getDrawPriority).foreach {
       entity =>
         val Position(x, y) = entity[Position]
@@ -68,7 +66,24 @@ class GameArea(canvas: Canvas) {
             g2d.setFill(colour.desaturate.desaturate.darker)
             drawTile()
           }
+
         }
+    }
+
+    g2d.setFill(Color.Green)
+    g2d.fillText(s"Enemies ${state.entities.count(_.get[Affinity].exists(_.faction == Affinity.Enemy))}", 0, 16)
+
+    input.target.foreach { case Position(x, y) =>
+      g2d.setStroke(Color.Yellow)
+
+      val Position(playerX, playerY) = player[Position]
+
+      val xOffset = (xTiles / 2) - (playerX - x)
+      val yOffset = (yTiles / 2) - (playerY - y)
+
+      val (displayX, displayY) = (xOffset * size, yOffset * size)
+
+      g2d.strokeRect(displayX, displayY, size, size)
     }
   }
 

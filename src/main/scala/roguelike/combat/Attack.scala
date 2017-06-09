@@ -17,26 +17,25 @@ import roguelike.movement.{Facing, Position}
 case class Attack(damage: Int) extends EventComponent {
   override val entityEvents: (Entity) => Iterable[Event] =
     entity =>
-      Seq(
-        projectileCollision(entity)
-      )
+      Seq(projectileCollision(entity))
 }
 
 object Attack {
   val BASE_DAMAGE = 10
 
-  val meleeAttack: Entity => Event = user => {
-    val pos = user[Position]
-    val Facing(dir) = user[Facing]
-    val affinity = user[Affinity]
+  def attackEvent(e: Entity, target: Option[Position] = None): Update = {
+    val attackTarget = target getOrElse (e[Position] move e[Facing].dir)
 
-    CreateEntity(meleeAttackEntity(user, pos, dir, affinity, BASE_DAMAGE))
+    (onIDMatch(e)
+      update Initiative.increase(120 / e[Speed].value)
+      trigger meleeAttack(attackTarget)
+      update (_.-[AttackMode])
+      )
   }
 
-  val attackEvent: Entity => Update = e => (
-    onIDMatch(e)
-      update Initiative.increase(120 / e[Speed].value)
-      trigger meleeAttack
-      update (_.-[AttackMode])
-    )
+  def meleeAttack(pos: Position): Entity => Event = user => {
+    val affinity = user[Affinity]
+
+    CreateEntity(meleeAttackEntity(user, pos, affinity, BASE_DAMAGE))
+  }
 }

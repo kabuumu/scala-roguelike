@@ -3,7 +3,7 @@ package ui.output
 import core.entity.Entity
 import core.system.GameState
 import roguelike.async.Initiative
-import roguelike.combat.{AttackMode$, Health}
+import roguelike.combat.Health
 import roguelike.experience.{Experience, Level}
 import ui.input.InputController
 

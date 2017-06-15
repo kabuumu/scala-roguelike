@@ -31,7 +31,7 @@ case class Entity(components: Iterable[Component]) extends Iterable[Component] {
       case _ => false
     }
 
-  def has[T <: Component : ClassTag] = get[T].isDefined
+  def has[T <: Component : ClassTag] = get[T].nonEmpty
 
   def get[T <: Component : ClassTag]: Option[T] = components.collectFirst { case c: T => c }
 

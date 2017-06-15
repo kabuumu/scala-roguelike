@@ -2,55 +2,52 @@ package roguelike.movement.lineofsight
 
 import java.lang.Math._
 
-import scala.annotation.tailrec
+import roguelike.movement.Position
 
 /**
   * Created by rob on 20/05/17.
   */
 object ShadowCaster {
-  def isVisible(x1: Int, y1: Int, x2: Int, y2: Int, blockers: Set[(Int, Int)]): Boolean = {
-    val dx = abs(x2 - x1)
-    val dy = abs(y2 - y1)
+  def isVisible(x1: Int, y1: Int, x2: Int, y2: Int, blockers: Set[(Int, Int)]): Boolean =
+    BresenhamLine(x1, y1, x2, y2) collectFirst {
+      case (`x2`, `y2`) => true
+      case pos if blockers contains pos => false
+    } getOrElse false
+}
 
-    val sx = if(x1 < x2) 1 else -1
-    val sy = if(y1 < y2) 1 else -1
+class BresenhamLine(var x: Int, var y: Int, x2: Int, y2: Int) extends Iterator[(Int, Int)] {
+  private val dx = abs(x2 - x)
+  private val dy = abs(y2 - y)
+  private val sx = if (x < x2) 1 else -1
+  private val sy = if (y < y2) 1 else -1
 
-    @tailrec
-    def loop(x: Int, y: Int, err: Int): Boolean = {
-      val point = x -> y
+  private var err = dx - dy
 
-      val e2 = err * 2
+  override def hasNext: Boolean = true
 
-      if (x == x2 && y == y2) true
-      else if(blockers.contains(point)) false
-      else {
-        val newX = if (e2 > -dy) x + sx else x
-        val newY = if (e2 < dx) y + sy else y
-        val newErr = {
-          if (e2 > -dy && e2 < dx) err - dy + dx
-          else if (e2 > -dy) err - dy
-          else if (e2 < dx) err + dx
-          else err
-        }
+  override def next(): (Int, Int) = {
+    val e2 = err * 2
 
-        loop(newX, newY, newErr)
-      }
+    if (e2 > -dy) {
+      x += sx
+      err -= dy
     }
 
-    loop(x1, y1, dx - dy)
+    if (e2 < dx) {
+      y += sy
+      err += dx
+    }
 
-//    def next = {
-//      val omitted = (x, y)
-//      val e2 = 2 * err
-//      if (e2 > -dy) {
-//        err -= dy
-//        x += sx
-//      }
-//      if (e2 < dx) {
-//        err += dx
-//        y += sy
-//      }
-//      omitted
-//    }
+    x -> y
+  }
+}
+
+object BresenhamLine {
+  def apply(origin: Position, target: Position): Iterator[Position] = {
+    new BresenhamLine(origin.x, origin.y, target.x, target.y) map { case (x, y) => Position(x, y) }
+  }
+
+  def apply(x: Int, y: Int, x2: Int, y2: Int): Iterator[(Int, Int)] = {
+    new BresenhamLine(x, y, x2, y2)
   }
 }

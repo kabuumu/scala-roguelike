@@ -30,16 +30,6 @@ object Projectile {
   def giveExperience(projectile: Entity): Event =
     increaseExperienceEvent(DEFAULT_EXP_AMOUNT)(projectile[Creator].entity)
 
-  def createProjectile: Triggered[Event] = creator => CreateEntity(
-    Entity(
-      creator[Position],
-      creator[Affinity],
-      creator[Facing],
-      Attack(20),
-      Velocity(20, creator[Facing].dir)
-    )
-  )
-
   def damageCheck(origin: Entity): Entity => Update = target =>
     onIDMatch(target) when not(matches(origin[Affinity])) update decreaseHealth(origin[Attack])
 }

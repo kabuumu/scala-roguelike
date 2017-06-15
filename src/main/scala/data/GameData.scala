@@ -6,11 +6,11 @@ import roguelike.actors.Affinity.{Enemy, Player}
 import roguelike.actors.attributes.Speed
 import roguelike.actors.{Affinity, Spawner}
 import roguelike.async.{Initiative, Temporary}
-import roguelike.combat.{Attack, Health}
+import roguelike.combat.{Attack, Health, Weapon}
 import roguelike.experience.{Experience, Level}
-import roguelike.movement.Direction.{Direction, Up}
-import roguelike.movement.lineofsight.{RememberedTiles, VisibleTiles}
+import roguelike.movement.Direction.Up
 import roguelike.movement._
+import roguelike.movement.lineofsight.{RememberedTiles, VisibleTiles}
 import roguelike.scenery.{Floor, Wall}
 
 /**
@@ -24,16 +24,18 @@ object GameData {
     Affinity(Player),
     Position(20, 20),
     Facing(Up),
-    Initiative(max = 10, current = 2),  //Current is 2 to enable automatic events to trigger before first player action
-                                        //such as visible tiles
+    Initiative(max = 10, current = 2), //Current is 2 to enable automatic events to trigger before first player action
+    //such as visible tiles
     Health(max = 200),
 
     Experience(0, 100),
     Level(1),
 
-    Speed(7),
+    Speed(6),
     VisibleTiles(Set.empty),
-    RememberedTiles(Set.empty)
+    RememberedTiles(Set.empty),
+
+    Weapon(range = 100, speed = 50)
   ))
 
   val orc = Entity(
@@ -51,6 +53,8 @@ object GameData {
     Speed(9),
     Blocker
   )
+  val walls = convert(arenaMap)
+  val DEFAULT_EXP_AMOUNT = 60
 
   def wall(position: Position) = Entity(
     Wall,
@@ -69,15 +73,14 @@ object GameData {
     Initiative(max = 100)
   )
 
-  val walls = convert(arenaMap)
-
-  def meleeAttackEntity(creator: Entity, pos: Position, affinity: Affinity, damage: Int) = Entity(
-    pos,
-    Creator(creator),
-    Attack(damage),
-    affinity,
-    Temporary,
-    Health(3))
-
-  val DEFAULT_EXP_AMOUNT = 60
+  def createProjectile(creator: Entity, path: Iterator[Position], affinity: Affinity, damage: Int, attackSpeed: Int): Entity =
+    Entity(
+      path.next(),
+      affinity,
+      Creator(creator),
+      Attack(damage),
+      Velocity(attackSpeed, path),
+      Temporary,
+      Health(30)
+    )
 }

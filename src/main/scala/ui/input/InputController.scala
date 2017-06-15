@@ -5,6 +5,7 @@ import core.event.Event
 import roguelike.actors.Actor._
 import roguelike.async.Initiative.isReady
 import roguelike.combat.Attack._
+import roguelike.combat.Attack
 import roguelike.movement.Direction.Direction
 import roguelike.movement.{Facing, Position}
 import ui.input.InputState._
@@ -38,7 +39,8 @@ class InputController {
             event
           case Some(dir: Direction) =>
             val newPos = target map (_.move(dir))
-            if ((newPos exists (_.sqDistance(entity[Position]) <= 2)) && !(newPos contains entity[Position])) target = newPos
+            val attackRange = Attack.getRange(entity)
+            if ((newPos exists (_.sqDistance(entity[Position]) <= attackRange)) && !(newPos contains entity[Position])) target = newPos
             None
           case _ =>
             None

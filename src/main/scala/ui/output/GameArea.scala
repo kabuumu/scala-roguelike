@@ -11,12 +11,16 @@ import ui.input.InputController
 import ui.output.OutputConfig._
 
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.paint.Color
+import scalafx.scene.paint.{Color, Paint}
 
 /**
   * Created by rob on 15/05/17.
   */
 class GameArea(canvas: Canvas) {
+  sealed trait Shape
+  case object Square extends Shape
+  case object Circle extends Shape
+
   val g2d = canvas.graphicsContext2D
 
   val width = canvas.getWidth - size * 5
@@ -49,24 +53,27 @@ class GameArea(canvas: Canvas) {
         val (displayX, displayY) = (xOffset * size, yOffset * size)
 
         if (displayX >= 0 && displayX < width && displayY >= 0 && displayY < height) {
-          val colour =
-            if (entity.has[Attack]) Color.LightGrey
-            else if (entity.exists[Affinity](_.faction == Affinity.Player)) Color.Green
-            else if (entity.exists[Affinity](_.faction == Affinity.Enemy)) Color.DarkRed
-            else if (entity.has[Wall]) Color.Grey.darker
-            else if (entity.has[Floor]) Color.SaddleBrown.darker.darker.desaturate
-            else Color.Black
+          def draw(shape: Shape, colour: Color) = {
+            def drawShape() = shape match {
+              case Square => g2d.fillRect(displayX, displayY, size, size)
+              case Circle => g2d.fillOval(displayX, displayY, size, size)
+            }
 
-          g2d.setFill(colour)
-
-          def drawTile() = g2d.fillRect(displayX, displayY, size, size)
-
-          if (isVisible) drawTile()
-          else if (isRemembered && isSceneryEntity) {
-            g2d.setFill(colour.desaturate.desaturate.darker)
-            drawTile()
+            if (isVisible) {
+              g2d.setFill(colour)
+              drawShape()
+            }
+            else if (isRemembered && isSceneryEntity) {
+              g2d.setFill(colour.desaturate.desaturate.darker)
+              drawShape()
+            }
           }
 
+          if (entity.has[Attack]) draw(Square, Color.LightGrey)
+          else if (entity.exists[Affinity](_.faction == Affinity.Player)) draw(Circle, Color.Green)
+          else if (entity.exists[Affinity](_.faction == Affinity.Enemy)) draw(Circle, Color.DarkRed)
+          else if (entity.has[Wall]) draw(Square, Color.Grey.darker)
+          else if (entity.has[Floor]) draw(Square, Color.SaddleBrown.darker.darker.desaturate)
         }
     }
 

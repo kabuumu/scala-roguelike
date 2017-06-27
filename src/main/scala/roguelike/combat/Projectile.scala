@@ -25,7 +25,7 @@ object Projectile {
     }
 
   def deathCheck(projectile: Entity): Triggered[Update] = target =>
-    onIDMatch(target) when noHealth trigger ((_:Entity) => giveExperience(projectile))
+    onIDMatch(target) when noHealth trigger giveExperience(projectile)
 
   def giveExperience(projectile: Entity): Event =
     increaseExperienceEvent(DEFAULT_EXP_AMOUNT)(projectile[Creator].entity)

@@ -2,11 +2,13 @@ package core.system
 
 import core.entity.{Entity, ID}
 import core.event.{CreateEntity, DeleteEntity, Event, Update}
+import roguelike.scenery.Scenery
 
 /**
   * Created by rob on 03/03/17.
   */
 case class GameState(entities: Iterable[Entity]) extends Iterable[Entity] {
+  
   def update(events: Iterable[Event]): GameState =
     applyUpdates(events).withCreations(events).withDeletions(events)
 

@@ -1,6 +1,7 @@
 package data
 
 import core.entity.{Creator, Entity, ID}
+import core.event.EventComponent._
 import data.map.MapConverter._
 import roguelike.actors.Affinity.{Enemy, Player}
 import roguelike.actors.attributes.Speed
@@ -8,6 +9,7 @@ import roguelike.actors.{Affinity, Spawner}
 import roguelike.async.{Initiative, Temporary}
 import roguelike.combat.{Attack, Health, Weapon}
 import roguelike.experience.{Experience, Level}
+import roguelike.light.{LightBlocker, LightCaster}
 import roguelike.movement.Direction.Up
 import roguelike.movement._
 import roguelike.movement.lineofsight.{RememberedTiles, VisibleTiles}
@@ -19,10 +21,10 @@ import roguelike.scenery.{Floor, Wall}
 object GameData {
   val playerID = new ID
 
-  val startingPlayer = new Entity(Seq(
+  def startingPlayer(pos: Position) = new Entity(Seq(
     playerID,
     Affinity(Player),
-    Position(20, 20),
+    pos,
     Facing(Up),
     Initiative(max = 10, current = 2), //Current is 2 to enable automatic events to trigger before first player action
     //such as visible tiles
@@ -30,36 +32,43 @@ object GameData {
 
     Experience(0, 100),
     Level(1),
-
     Speed(6),
+
     VisibleTiles(Set.empty),
     RememberedTiles(Set.empty),
 
-    Weapon(range = 100, speed = 50)
+    LightBlocker(0.5),
+
+    Weapon(range = 100, projectileSpeed = 50, attackSpeed = 150)
   ))
 
-  val orc = Entity(
+  def orc = Entity(
     Affinity(Enemy),
     Initiative(max = 21),
     Health(max = 30),
     Speed(4),
-    Blocker
+    Blocker,
+    LightBlocker(0.5)
   )
 
-  val goblin = Entity(
+  def goblin = Entity(
     Affinity(Enemy),
     Initiative(max = 7),
     Health(max = 7),
-    Speed(9),
-    Blocker
+    Speed(7),
+    Blocker,
+    LightBlocker(0.5),
+    Weapon(range = 50, projectileSpeed = 40, attackSpeed = 1000)
   )
-  val walls = convert(arenaMap)
+
+  val map = convert(dungeonMap)
   val DEFAULT_EXP_AMOUNT = 60
 
   def wall(position: Position) = Entity(
     Wall,
     Blocker,
-    position
+    position,
+    LightBlocker(0)
   )
 
   def floor(position: Position) = Entity(
@@ -81,6 +90,15 @@ object GameData {
       Attack(damage),
       Velocity(attackSpeed, path),
       Temporary,
+      LightBlocker(0.6),
       Health(30)
     )
+
+  def torch(pos: Position): Entity =
+    Entity(
+      pos,
+      LightCaster(1.5)
+    )
+
+  val startingData = map
 }

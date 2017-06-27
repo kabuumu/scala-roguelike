@@ -1,6 +1,6 @@
 package data.map
 
-import core.entity.Entity
+import core.entity.{Entity, ID}
 import data.GameData._
 import roguelike.movement.Position
 
@@ -8,15 +8,6 @@ import roguelike.movement.Position
   * Created by rob on 21/04/17.
   */
 object MapConverter {
-  def convert(tileMap: Seq[String]): Seq[Entity] =
-    tileMap.zipWithIndex.flatMap {
-      case (row, y) =>
-        row.zipWithIndex.collect {
-          case ('X', x) => wall(Position(x, y))
-          case ('O', x) => floor(Position(x, y))
-        }
-    }
-
   val tileMap: Seq[String] =
     Seq(
       "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -40,7 +31,6 @@ object MapConverter {
       "XOOOOOOOOOOOOXOOOOOOOOOOOOX",
       "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
     )
-
   val newMap: Seq[String] =
     Seq(
       //123456789012345678901234567890123456789
@@ -85,7 +75,6 @@ object MapConverter {
       "XOOX",
       ""
     )
-
   val arenaMap: Seq[String] = Seq(
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "XOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOX",
@@ -128,4 +117,41 @@ object MapConverter {
     "XOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOX",
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   )
+  val dungeonMap: Seq[String] = Seq(
+    "         XXXX                ",
+    "         X PX                ",
+    "         X  X                ",
+    "    XXXXXX  XXXXXXXXXXXXX    ",
+    "    XT          TXT     X    ",
+    "    X            X      X    ",
+    "    X                   X    ",
+    "    X                G  X    ",
+    "    X            X      X    ",
+    "    X            XT G   X    ",
+    "    X            XXXX XXX    ",
+    "    X            X  X X      ",
+    "    X            X  X X      ",
+    "    X            X XX XX     ",
+    "    X            X X   X     ",
+    "    X            X X   X     ",
+    "    X            X X T X     ",
+    "    X            X XXXXX     ",
+    "    X            X           ",
+    "    X            X           "
+  )
+
+  def convert(tileMap: Seq[String]): Seq[Entity] =
+    tileMap.zipWithIndex.flatMap {
+      case (row, y) =>
+        row.zipWithIndex.collect {
+          case (tile, x) =>
+            (tile match {
+              case 'X' => wall _
+              case 'O' | ' ' => floor _
+              case 'T' => torch _
+              case 'P' => startingPlayer _
+              case 'G' => goblin + _
+            }) apply Position(x, y)
+        }
+    }
 }

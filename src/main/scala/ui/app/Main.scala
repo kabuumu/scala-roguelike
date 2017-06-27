@@ -32,11 +32,7 @@ object Main extends JFXApp {
   var keyConsumer = new KeyEventConsumer
   val input = new InputController
 
-  var state: GameState = GameState(Seq(
-    startingPlayer,
-    enemySpawner(orc, Position(1, 19)),
-    enemySpawner(goblin, Position(38, 19))
-  ) ++ walls).update(Seq(triggerEntityEvents))
+  var state: GameState = GameState(startingData)//.update(Seq(triggerEntityEvents))
 
   stage = new PrimaryStage {
     title = "scala-roguelike"
@@ -54,12 +50,12 @@ object Main extends JFXApp {
         player <- state.entities.find(_[ID] == playerID)
       } {
         val inputEvents = input.getInputEvents(player, keyConsumer)
-
+        
         output.update(state, player, input)
 
         if ((player exists notReady) || inputEvents.nonEmpty) {
           val events = Seq(
-            EnemyAI.enemyMoveEvent(player),
+            EnemyAI.enemyActionEvent(player),
             triggerEntityEvents
           ) ++ inputEvents
 

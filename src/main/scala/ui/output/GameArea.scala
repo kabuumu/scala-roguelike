@@ -4,6 +4,7 @@ import core.entity.Entity
 import core.system.GameState
 import roguelike.actors.Affinity
 import roguelike.combat.Attack
+import roguelike.light.{LightBlocker, LightCaster}
 import roguelike.movement.lineofsight.{RememberedTiles, VisibleTiles}
 import roguelike.movement.{Blocker, Position}
 import roguelike.scenery.{Floor, Scenery, Wall}
@@ -11,7 +12,7 @@ import ui.input.InputController
 import ui.output.OutputConfig._
 
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.paint.{Color, Paint}
+import scalafx.scene.paint.Color
 
 /**
   * Created by rob on 15/05/17.
@@ -28,6 +29,8 @@ class GameArea(canvas: Canvas) {
   val xTiles = width / size
   val yTiles = height / size
 
+  val minLightLevel: Double = .5
+
   def update(state: GameState, player: Entity, input: InputController) = {
     g2d.setFill(Color.Black.brighter.brighter)
     g2d.fillRect(0, 0, width, height)
@@ -36,6 +39,9 @@ class GameArea(canvas: Canvas) {
   }
 
   def drawEntities(state: GameState, player: Entity, input: InputController) = {
+    val lightCasters = state.entities.filter (_.has[LightCaster])
+    val blockers = state.entities collect { case e if e.has[LightBlocker] => e[Position] -> e[LightBlocker]} toSet
+
     state.entities.toSeq.sortBy(getDrawPriority).foreach {
       entity =>
         val Position(x, y) = entity[Position]
@@ -53,6 +59,23 @@ class GameArea(canvas: Canvas) {
         val (displayX, displayY) = (xOffset * size, yOffset * size)
 
         if (displayX >= 0 && displayX < width && displayY >= 0 && displayY < height) {
+
+
+          val lightLevels: Iterable[Double] = (lightCasters map (lc =>
+            LightCaster.getLightLevel(lc[LightCaster], lc[Position], entity[Position], blockers)
+            )).filterNot(_ == 0)//.sum.min(2).max(minLightLevel)
+
+          val lightLevel = if(lightLevels.isEmpty) minLightLevel
+          else (lightLevels.sum / lightLevels.size).max(minLightLevel)
+
+//          val lightLevel = (lightLevels.sum / 2).max(minLightLevel)
+
+          def getColour(colour: Color, lightLevel: Double) = {
+            def colourOf(colour:Double) = (colour * lightLevel * 255).toInt.min(255)
+
+            Color.rgb(colourOf(colour.red), colourOf(colour.green), colourOf(colour.blue))
+          }
+
           def draw(shape: Shape, colour: Color) = {
             def drawShape() = shape match {
               case Square => g2d.fillRect(displayX, displayY, size, size)
@@ -60,11 +83,11 @@ class GameArea(canvas: Canvas) {
             }
 
             if (isVisible) {
-              g2d.setFill(colour)
+              g2d.setFill(getColour(colour, lightLevel))
               drawShape()
             }
             else if (isRemembered && isSceneryEntity) {
-              g2d.setFill(colour.desaturate.desaturate.darker)
+              g2d.setFill(getColour(colour.desaturate.desaturate, minLightLevel))
               drawShape()
             }
           }
@@ -74,6 +97,7 @@ class GameArea(canvas: Canvas) {
           else if (entity.exists[Affinity](_.faction == Affinity.Enemy)) draw(Circle, Color.DarkRed)
           else if (entity.has[Wall]) draw(Square, Color.Grey.darker)
           else if (entity.has[Floor]) draw(Square, Color.SaddleBrown.darker.darker.desaturate)
+          else if (entity.has[LightCaster]) draw(Square, Color.Orange)
         }
     }
 

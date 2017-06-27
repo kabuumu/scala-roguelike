@@ -23,24 +23,27 @@ case class Attack(damage: Int) extends EventComponent {
 
 object Attack {
   val BASE_DAMAGE = 10
+  val BASE_ATTACK_SPEED = 500
 
   def attackEvent(e: Entity, target: Option[Position] = None): Update = {
     val attackTarget = target getOrElse (e[Position] move e[Facing].dir)
     val attackPath = BresenhamLine(e[Position], attackTarget)
+    val initiativeIncrease = getAttackSpeed(e) / e[Speed].value
 
     (onIDMatch(e)
-      update Initiative.increase(120 / e[Speed].value)
+      update Initiative.increase(initiativeIncrease)
       trigger attack(attackPath)
       )
   }
 
   def attack(path: Iterator[Position]): Entity => Event = user => {
     val affinity = user[Affinity]
-    val attackSpeed = getAttackSpeed(user)
+    val attackSpeed = getProjectileSpeed(user)
 
     CreateEntity(GameData.createProjectile(user, path, affinity, BASE_DAMAGE, attackSpeed))
   }
 
   def getRange(entity: Entity) = entity.get[Weapon].fold(2)(_.range)
-  def getAttackSpeed(entity: Entity) = entity.get[Weapon].fold(0)(_.speed)
+  def getProjectileSpeed(entity: Entity) = entity.get[Weapon].fold(0)(_.projectileSpeed)
+  def getAttackSpeed(entity: Entity) = entity.get[Weapon].fold(BASE_ATTACK_SPEED)(_.attackSpeed)
 }

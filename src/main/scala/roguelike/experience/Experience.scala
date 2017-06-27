@@ -14,7 +14,6 @@ case class Experience(current: Int = 0, max: Int) extends Component
 object Experience {
   def increaseExperienceEvent(amount: Int): Entity => Event = e =>
     onIDMatch(e) update increaseExperience(amount) trigger levelUpCheck
-
   def increaseExperience(amount: Int): Experience => Experience =
     old => Experience(old.current + amount, old.max)
 

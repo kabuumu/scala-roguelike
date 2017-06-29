@@ -9,7 +9,7 @@ import roguelike.actors.{Affinity, Spawner}
 import roguelike.async.{Initiative, Temporary}
 import roguelike.combat.{Attack, Health, Weapon}
 import roguelike.experience.{Experience, Level}
-import roguelike.light.{LightBlocker, LightCaster}
+import roguelike.light.{LightBlocker, LightCaster, LightMap}
 import roguelike.movement.Direction.Up
 import roguelike.movement._
 import roguelike.movement.lineofsight.{RememberedTiles, VisibleTiles}
@@ -36,6 +36,7 @@ object GameData {
 
     VisibleTiles(Set.empty),
     RememberedTiles(Set.empty),
+    LightMap(),
 
     LightBlocker(0.5),
 
@@ -48,7 +49,8 @@ object GameData {
     Health(max = 30),
     Speed(4),
     Blocker,
-    LightBlocker(0.5)
+    LightBlocker(0.5),
+    Weapon(range = 1, projectileSpeed = 0, attackSpeed = 500)
   )
 
   def goblin = Entity(
@@ -90,14 +92,14 @@ object GameData {
       Attack(damage),
       Velocity(attackSpeed, path),
       Temporary,
-      LightBlocker(0.6),
+      LightBlocker(0.8),
       Health(30)
     )
 
   def torch(pos: Position): Entity =
     Entity(
       pos,
-      LightCaster(1.5)
+      LightCaster(.8)
     )
 
   val startingData = map

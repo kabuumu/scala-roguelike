@@ -6,11 +6,9 @@ import core.system.GameState
 import data.GameData._
 import roguelike.ai.EnemyAI
 import roguelike.async.Initiative._
-import roguelike.movement.Position
-import ui.input.{InputController, InputState, KeyEventConsumer}
-import ui.input.InputState.InputState
-import ui.output.OutputController
+import ui.input.{InputController, KeyEventConsumer}
 import ui.output.OutputConfig._
+import ui.output.OutputController
 
 import scala.language.postfixOps
 import scalafx.Includes._
@@ -19,7 +17,6 @@ import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafx.scene.canvas.Canvas
-import scalafx.scene.input.KeyCode
 
 /**
   * Created by rob on 13/04/16.

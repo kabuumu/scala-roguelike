@@ -118,26 +118,45 @@ object MapConverter {
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   )
   val dungeonMap: Seq[String] = Seq(
-    "         XXXX                ",
-    "         X PX                ",
-    "         X  X                ",
-    "    XXXXXX  XXXXXXXXXXXXX    ",
-    "    XT          TXT     X    ",
-    "    X            X      X    ",
-    "    X                   X    ",
-    "    X                G  X    ",
-    "    X            X      X    ",
-    "    X            XT G   X    ",
-    "    X            XXXX XXX    ",
-    "    X            X  X X      ",
-    "    X            X  X X      ",
-    "    X            X XX XX     ",
-    "    X            X X   X     ",
-    "    X            X X   X     ",
-    "    X            X X T X     ",
-    "    X            X XXXXX     ",
-    "    X            X           ",
-    "    X            X           "
+    "                                                            ",
+    "                                                            ",
+    "                                                            ",
+    "             XXXXXXXXXX                                     ",
+    "             X        X                                     ",
+    "             X        X                                     ",
+    "             X        X                                     ",
+    "             X        X                                     ",
+    "             X  O  O  X                                     ",
+    "             X        X                                     ",
+    "             X        X                                     ",
+    "             XXXT  TXXX                                     ",
+    "               X    X                                       ",
+    "               X    X             XXXXXXXXXX                ",
+    "               X    X             X        X                ",
+    "               X    X             X        X                ",
+    "               X    X             X   O    X                ",
+    "      XXXXXXXXXXT  TXXXXXXXXX     X G    G X                ",
+    "      X                     X     X        X                ",
+    "      X                     X     X  T  T  X                ",
+    "      X  XXXXXXXXXXXXXXXXX  X     XXXX  XXXX                ",
+    "      X  X               X  X        X  X                   ",
+    "    XXX  XXX             X  X        X  X                   ",
+    "    X      X  XXXXX XXXXXX  XXXXXX   X  X                   ",
+    "    X G   TXXXX   X X    T  T    XXXXX  X                   ",
+    "    X             X X                   X                   ",
+    "    X G   TXXXX   X X    O  O           X                   ",
+    "    X      X  XX XX X            XXXXXXXX                   ",
+    "    X T  T X   X X  X            X                          ",
+    "    XXXXXXXX XXX XXXX            X                          ",
+    "             X      X            X                          ",
+    "             X  G  TX            X                          ",
+    "             X                   X                          ",
+    "             X                   X                          ",
+    "             X  G  TX            X                          ",
+    "             X      X    T  T    X                          ",
+    "             XXXXXXXXXXXXX  XXXXXX                          ",
+    "                         XP X                               ",
+    "                         XXXX                               "
   )
 
   def convert(tileMap: Seq[String]): Seq[Entity] =
@@ -147,10 +166,11 @@ object MapConverter {
           case (tile, x) =>
             (tile match {
               case 'X' => wall _
-              case 'O' | ' ' => floor _
+              case ' ' => floor _
               case 'T' => torch _
               case 'P' => startingPlayer _
               case 'G' => goblin + _
+              case 'O' => orc + _
             }) apply Position(x, y)
         }
     }

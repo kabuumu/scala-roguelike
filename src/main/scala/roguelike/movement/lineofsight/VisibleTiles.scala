@@ -6,6 +6,7 @@ import core.entity.Entity
 import core.event.CoreEvents._
 import core.event.EventBuilder._
 import core.event.{Event, EventComponent, Update}
+import roguelike.light.LightBlocker
 import roguelike.movement.Direction.{apply => _, _}
 import roguelike.movement.lineofsight.RememberedTiles._
 import roguelike.movement.lineofsight.ShadowCaster.isVisible
@@ -26,7 +27,7 @@ case class VisibleTiles(tiles: Set[Position]) extends EventComponent {
             Facing(direction) <- origin.get[Facing]
           } yield {
             val blockers =
-              (state.entities.seq filter (_.has[Blocker]) map (_[Position]) map (pos => (pos.x, pos.y))).toSet
+              (state.entities.seq filter (_.exists[LightBlocker](_.value == 0)) map (_[Position]) map (pos => (pos.x, pos.y))).toSet
 
             val visibleTiles = for {
               targetX <- x - range to x + range

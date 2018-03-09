@@ -22,13 +22,14 @@ class InputController {
     import keyEventConsumer._
 
     inputState match {
-      case Game => if (entity exists isReady) lastInput flatMap {
+      case Game => if (entity exists isReady) {lastInput flatMap {
         case dir: Direction => Some(actorMove(dir)(entity))
         case AttackInput =>
           inputState = TargetSelect
           target = Some(entity[Position].move(entity[Facing].dir))
           None
         case _ => None
+      }
       } else Nil
       case TargetSelect =>
         lastInput match {

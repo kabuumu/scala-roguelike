@@ -1,6 +1,7 @@
 package core.event
 
 import core.event.Event.Triggered
+import roguelike.movement.lineofsight.VisibleTiles
 
 /**
   * Created by rob on 05/04/17.

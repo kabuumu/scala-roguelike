@@ -1,19 +1,19 @@
 package ui.input
 
+import org.lwjgl.glfw.GLFW._
 import roguelike.movement.Direction
 import ui.input.KeyEventConsumer.InputKey
 
-import scalafx.scene.input.{KeyCode, KeyEvent}
 
 /**
   * Created by rob on 07/06/17.
   */
-class KeyEventConsumer(keyCodes: Set[KeyCode] = Set.empty,
-                       var lastKeyTyped: Option[KeyCode] = None
+class KeyEventConsumer(val keyCodes: Set[Int] = Set.empty,
+                       var lastKeyTyped: Option[Int] = None
                       ) {
-  def +(event: KeyEvent) = new KeyEventConsumer(keyCodes + event.code, lastKeyTyped)
-  def -(event: KeyEvent) = if(keyCodes.contains(event.code)) {
-    new KeyEventConsumer(keyCodes - event.code, Some(event.code))
+  def +(event: Int) = new KeyEventConsumer(keyCodes + event, lastKeyTyped)
+  def -(event: Int) = if(keyCodes.contains(event)) {
+    new KeyEventConsumer(keyCodes - event, Some(event))
   }
   else this
 
@@ -25,11 +25,11 @@ class KeyEventConsumer(keyCodes: Set[KeyCode] = Set.empty,
   }
 
   private val inputMap = Map(
-    KeyCode.Up -> Direction.Up,
-    KeyCode.Down -> Direction.Down,
-    KeyCode.Left -> Direction.Left,
-    KeyCode.Right -> Direction.Right,
-    KeyCode.A -> AttackInput
+    GLFW_KEY_UP -> Direction.Up,
+    GLFW_KEY_DOWN -> Direction.Down,
+    GLFW_KEY_LEFT -> Direction.Left,
+    GLFW_KEY_RIGHT -> Direction.Right,
+    GLFW_KEY_A -> AttackInput
   )
 }
 
